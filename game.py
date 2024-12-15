@@ -1,5 +1,6 @@
 import pygame
 import utils.button
+import utils.health_bar
 
 # Initialize the game
 pygame.init()
@@ -24,9 +25,17 @@ running = True
 # define the button
 button = utils.button.Button(100, 100, 200, 100, (255, 0, 0, 100), '', lambda: print('Hello'))
 
+# health bar
+health_bar = utils.health_bar.HealthBar(10, 10, 200, 20, 100, "Darius")
+damage_button = utils.button.Button(310, 100, 200, 50, (255, 0, 0, 100), 'Damage', lambda: health_bar.update_health(-10))
+heal_button = utils.button.Button(310, 150, 200, 50, (255, 0, 0, 100), 'Heal', lambda: health_bar.update_health(10))
+
 # Draw the game
 def draw_game():
     button.draw(surface)
+    health_bar.draw(screen)
+    damage_button.draw(surface)
+    heal_button.draw(surface)
 
 while running:
     # Cap the frame rate
