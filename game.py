@@ -50,7 +50,7 @@ def draw_game():
 
 while running:
     # Cap the frame rate
-    delta_time = clock.tick(60) / 1000
+    clock.tick(60)
 
     # Handle events
     for event in pygame.event.get():
@@ -69,7 +69,7 @@ while running:
         player.y += 5
 
     # Update the speed bar based on time
-    enemy.speed_bar.update_speed(delta_time, 30)
+    enemy.speed_bar.update_speed(1 / 5, 1)
     enemy.speed_bar.update()
     enemy.health_bar.update()
 

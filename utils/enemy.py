@@ -32,6 +32,6 @@ class Enemy:
 
     def update_health(self, amount):
         self.health_bar.update_value(amount)
-        if self.health_bar.current_value <= 0:
+        if self.health_bar.target_value <= 0:
             self.alive = False
             self.current_frame = 0
