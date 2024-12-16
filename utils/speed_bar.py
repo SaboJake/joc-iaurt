@@ -17,6 +17,6 @@ class SpeedBar(Bar):
             self.flash_timer = 0
         super().draw(surface)
 
-    def update_speed(self, value, mysterious_value):
+    def update_speed(self, value):
         # Increase the speed based on the elapsed time
-        self.update_value(value * mysterious_value)
+        self.update_value(value)

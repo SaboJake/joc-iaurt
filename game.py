@@ -36,7 +36,8 @@ sprite_paths = ['sprites/enemies/AMOGUS_1.png', 'sprites/enemies/AMOGUS_2.png', 
 death_sprite_paths = ['sprites/enemies/AMOGUS_death_1.png', 'sprites/enemies/AMOGUS_death_2.png']
 enemy = Enemy(400, 350, 150, 150, 100, 100, "Amogus", sprite_paths, death_sprite_paths)
 enemy_damage_button = utils.button.Button(310, 200, 200, 50, (255, 0, 0, 100), 'Damage Enemy', lambda: enemy.update_health(-10))
-enemy_decrease_speed_button = utils.button.Button(310, 250, 200, 50, (255, 0, 0, 100), 'Decrease Speed', lambda: enemy.speed_bar.update_speed(-10, 1))
+enemy_decrease_speed_button = utils.button.Button(310, 250, 200, 50, (255, 0, 0, 100), 'Decrease Speed', lambda: enemy.speed_bar.update_value(-10))
+speed_coef = 1 / 5
 
 # Draw the game
 def draw_game():
@@ -69,9 +70,12 @@ while running:
         player.y += 5
 
     # Update the speed bar based on time
-    enemy.speed_bar.update_speed(1 / 5, 1)
+    enemy.speed_bar.update_speed(speed_coef)
+
+    # Update the bars
     enemy.speed_bar.update()
     enemy.health_bar.update()
+    health_bar.update()
 
     # Draw the game
     screen.fill(BLACK)
