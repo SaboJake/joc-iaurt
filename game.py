@@ -1,14 +1,15 @@
 import pygame
-import utils.button
-import utils.health_bar
+from utils.button import Button
+from utils.health_bar import HealthBar
 from utils.enemy import Enemy
+from utils.stage import Stage
 
 # Initialize the game
 pygame.init()
 
 # Set up the screen
-screen = pygame.display.set_mode((800, 600))
-surface = pygame.Surface((800, 600), pygame.SRCALPHA)
+screen = pygame.display.set_mode((1000, 750))
+surface = pygame.Surface((1000, 750), pygame.SRCALPHA)
 
 # Set up the colors
 BLACK = (0, 0, 0)
@@ -24,20 +25,35 @@ clock = pygame.time.Clock()
 running = True
 
 # define the button
-button = utils.button.Button(100, 100, 200, 100, (255, 0, 0, 100), '', lambda: print('Hello'))
+button = Button(100, 100, 200, 100, (255, 0, 0, 100), 'Hello', lambda: print('Hello'))
 
 # health bar
-health_bar = utils.health_bar.HealthBar(10, 10, 200, 20, 100, "Darius")
-damage_button = utils.button.Button(310, 100, 200, 50, (255, 0, 0, 100), 'Damage', lambda: health_bar.update_value(-10))
-heal_button = utils.button.Button(310, 150, 200, 50, (255, 0, 0, 100), 'Heal', lambda: health_bar.update_value(10))
+health_bar = HealthBar(10, 10, 200, 20, 100, "Darius")
+damage_button = Button(310, 100, 200, 50, (255, 0, 0, 100), 'Damage', lambda: health_bar.update_value(-10))
+heal_button = Button(310, 150, 200, 50, (255, 0, 0, 100), 'Heal', lambda: health_bar.update_value(10))
 
 # Create an enemy with animations
 sprite_paths = ['sprites/enemies/AMOGUS_1.png', 'sprites/enemies/AMOGUS_2.png', 'sprites/enemies/AMOGUS_3.png', 'sprites/enemies/AMOGUS_4.png']
 death_sprite_paths = ['sprites/enemies/AMOGUS_death_1.png', 'sprites/enemies/AMOGUS_death_2.png']
 enemy = Enemy(400, 350, 150, 150, 100, 100, "Amogus", sprite_paths, death_sprite_paths)
-enemy_damage_button = utils.button.Button(310, 200, 200, 50, (255, 0, 0, 100), 'Damage Enemy', lambda: enemy.update_health(-10))
-enemy_decrease_speed_button = utils.button.Button(310, 250, 200, 50, (255, 0, 0, 100), 'Decrease Speed', lambda: enemy.speed_bar.update_value(-10))
+enemy_damage_button = Button(310, 200, 200, 50, (255, 0, 0, 100), 'Damage Enemy', lambda: enemy.update_health(-10))
+enemy_decrease_speed_button = Button(310, 250, 200, 50, (255, 0, 0, 100), 'Decrease Speed', lambda: enemy.speed_bar.update_value(-10))
 speed_coef = 1 / 5
+
+# Create stage with enemies
+stage = None
+stage_active = False
+
+def start_stage():
+    global stage
+    names_array = ["Amogus", "Amogus", "Amogus"]
+    sprite_paths_array = [sprite_paths, sprite_paths, sprite_paths]
+    death_sprite_paths_array = [death_sprite_paths, death_sprite_paths, death_sprite_paths]
+    stage = Stage(names_array, sprite_paths_array, death_sprite_paths_array)
+    global stage_active
+    stage_active = True
+
+start_stage_button = Button(100, 200, 200, 100, (255, 0, 0, 100), 'Start Stage', lambda: start_stage())
 
 # Draw the game
 def draw_game():
@@ -48,6 +64,7 @@ def draw_game():
     enemy.draw(screen)
     enemy_damage_button.draw(surface)
     enemy_decrease_speed_button.draw(surface)
+    start_stage_button.draw(surface)
 
 while running:
     # Cap the frame rate
@@ -69,18 +86,25 @@ while running:
     if keys[pygame.K_DOWN]:
         player.y += 5
 
-    # Update the speed bar based on time
-    enemy.speed_bar.update_speed(speed_coef)
-
-    # Update the bars
-    enemy.speed_bar.update()
-    enemy.health_bar.update()
-    health_bar.update()
+    if stage_active:
+        # Update the stage
+        stage.update()
+        if stage.all_enemies_dead():
+            stage_active = False
+    else:
+        # Update the main game
+        enemy.speed_bar.update_speed(speed_coef)
+        enemy.speed_bar.update()
+        enemy.health_bar.update()
+        health_bar.update()
 
     # Draw the game
     screen.fill(BLACK)
-    screen.blit(surface, (0, 0))
-    draw_game()
+    if stage_active:
+        stage.draw(screen)
+    else:
+        screen.blit(surface, (0, 0))
+        draw_game()
     pygame.display.flip()
 
 # Quit the game
