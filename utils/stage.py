@@ -3,16 +3,25 @@ import pygame
 from utils.button import Button
 from utils.enemy import Enemy
 
-enemy_x = [300, 500, 700]
-enemy_y = [350, 350, 350]
+enemy_x = [600, 700, 700]
+enemy_y = [350, 200, 500]
 enemy_width = 150
 enemy_height = 150
+enemy_health_x = [750, 750, 750]
+enemy_health_y = [10, 40, 70]
 
 class Stage:
     def __init__(self, names_array, sprite_paths_array, death_sprite_paths_array):
         enemies = []
-        for i in range(len(names_array)):
-            enemies.append(Enemy(enemy_x[i], enemy_y[i], enemy_width, enemy_height, 100, 100, names_array[i], sprite_paths_array[i], death_sprite_paths_array[i]))
+
+        if len(names_array) == 2:
+            for i in range(len(names_array)):
+                enemies.append(Enemy(enemy_x[i + 1], enemy_y[i + 1], enemy_width, enemy_height, 100, enemy_health_x[i], enemy_health_y[i],100, names_array[i], sprite_paths_array[i], death_sprite_paths_array[i]))
+
+        else:
+            for i in range(len(names_array)):
+                enemies.append(Enemy(enemy_x[i], enemy_y[i], enemy_width, enemy_height, 100, enemy_health_x[i], enemy_health_y[i], 100, names_array[i], sprite_paths_array[i], death_sprite_paths_array[i]))
+
         self.enemies = enemies
 
         # Temporary buttons for testing

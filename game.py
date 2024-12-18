@@ -35,7 +35,7 @@ heal_button = Button(310, 150, 200, 50, (255, 0, 0, 100), 'Heal', lambda: health
 # Create an enemy with animations
 sprite_paths = ['sprites/enemies/AMOGUS_1.png', 'sprites/enemies/AMOGUS_2.png', 'sprites/enemies/AMOGUS_3.png', 'sprites/enemies/AMOGUS_4.png']
 death_sprite_paths = ['sprites/enemies/AMOGUS_death_1.png', 'sprites/enemies/AMOGUS_death_2.png']
-enemy = Enemy(400, 350, 150, 150, 100, 100, "Amogus", sprite_paths, death_sprite_paths)
+enemy = Enemy(400, 350, 150, 150, 100, 500, 500, 100, "Amogus", sprite_paths, death_sprite_paths)
 enemy_damage_button = Button(310, 200, 200, 50, (255, 0, 0, 100), 'Damage Enemy', lambda: enemy.update_health(-10))
 enemy_decrease_speed_button = Button(310, 250, 200, 50, (255, 0, 0, 100), 'Decrease Speed', lambda: enemy.speed_bar.update_value(-10))
 speed_coef = 1 / 5
@@ -54,6 +54,9 @@ def start_stage():
     stage_active = True
 
 start_stage_button = Button(100, 200, 200, 100, (255, 0, 0, 100), 'Start Stage', lambda: start_stage())
+
+# Load the background image
+background_image = pygame.image.load('sprites/backgrounds/Untitled.png')
 
 # Draw the game
 def draw_game():
@@ -101,6 +104,7 @@ while running:
     # Draw the game
     screen.fill(BLACK)
     if stage_active:
+        screen.blit(background_image, (0, 0))
         stage.draw(screen)
     else:
         screen.blit(surface, (0, 0))
