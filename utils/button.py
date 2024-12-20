@@ -19,7 +19,7 @@ class Button():
         text = font.render(self.text, True, (255, 255, 255))
         pygame.draw.rect(surface, self.color, self.rect)
         text_surface = font.render(self.text, True, (255, 255, 255))
-        if (len(self.color) == 4):
+        if len(self.color) == 4:
             text_surface.set_alpha(self.color[3])
         surface.blit(text_surface, (self.x + self.width / 2 - text_surface.get_width() / 2, self.y + self.height / 2 - text_surface.get_height() / 2))
 
