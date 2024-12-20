@@ -33,3 +33,14 @@ class Unit:
         self.stats.intelligence = self.stats.coefs['intelligence'].update(self.base_stats.intelligence)
         self.stats.speed = self.stats.coefs['speed'].update(self.base_stats.speed)
         self.stats.focus = self.stats.coefs['focus'].update(self.base_stats.focus)
+
+    def add_effect(self, effect):
+        self.effects.append(effect)
+
+    def apply_effects(self):
+        for effect in self.effects:
+            effect.apply(self)
+            effect.duration -= 1
+            if effect.duration == 0:
+                effect.remove(self)
+                self.effects.remove(effect)
