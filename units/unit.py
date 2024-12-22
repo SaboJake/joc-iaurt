@@ -28,11 +28,11 @@ class Unit:
 
     # Should be called every time a coefficient is changed
     def update_stats(self):
-        self.stats.vitality = self.stats.coefs['vitality'].update(self.base_stats.vitality)
-        self.stats.strength = self.stats.coefs['strength'].update(self.base_stats.strength)
-        self.stats.intelligence = self.stats.coefs['intelligence'].update(self.base_stats.intelligence)
-        self.stats.speed = self.stats.coefs['speed'].update(self.base_stats.speed)
-        self.stats.focus = self.stats.coefs['focus'].update(self.base_stats.focus)
+        self.stats.vitality = self.coeffs['vitality'].update(self.base_stats.vitality)
+        self.stats.strength = self.coeffs['strength'].update(self.base_stats.strength)
+        self.stats.intelligence = self.coeffs['intelligence'].update(self.base_stats.intelligence)
+        self.stats.speed = self.coeffs['speed'].update(self.base_stats.speed)
+        self.stats.focus = self.coeffs['focus'].update(self.base_stats.focus)
 
     def add_effect(self, effect):
         self.effects.append(effect)
