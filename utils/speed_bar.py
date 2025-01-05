@@ -7,6 +7,7 @@ class SpeedBar(Bar):
         self.current_value = 0
         self.target_value = 0
         self.real_value = 0
+        self.decrease_speed = 10
 
     def draw(self, surface):
         if self.current_value == self.max_value:

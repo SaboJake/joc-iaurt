@@ -64,7 +64,28 @@ class Stage:
                                         lambda j=i: enemies[j].update_health(-10)))
         self.enemy_buttons = enemy_buttons
 
+        self.delay = 0
+        self.choosing_ability = False
+        self.end_turn_button = Button(475, 650, 50, 50, (255, 0, 0, 100), 'End Turn', lambda: setattr(self, 'choosing_ability', False))
+
     def update(self):
+        for ally in self.allies:
+            ally.speed_bar.update()
+            ally.health_bar.update()
+
+        for enemy in self.enemies:
+            enemy.speed_bar.update()
+            enemy.health_bar.update()
+
+        # wait for the player to choose an ability
+        if self.choosing_ability:
+            return
+
+        # delay after an attack
+        if self.delay > 0:
+            self.delay -= 1
+            return
+
         i = 0
         for ally in self.allies:
             i += 1
@@ -75,6 +96,7 @@ class Stage:
                 print("ally " + str(i) + " damage " + str(damage_value))
                 self.enemies[0].update_health(-damage_value)
                 ally.speed_bar.update_value(-ally.speed_bar.max_value)
+                self.choosing_ability = True
                 if self.enemies[0].health_bar.target_value <= 0:
                     self.enemies.remove(self.enemies[0])
 
@@ -85,8 +107,6 @@ class Stage:
 
             # update bars
             ally.speed_bar.update_speed(ally.unit.stats.speed / 50)
-            ally.speed_bar.update()
-            ally.health_bar.update()
 
         i = 0
         for enemy in self.enemies:
@@ -98,6 +118,7 @@ class Stage:
                 print("enemy " + str(i) + " damage " + str(damage_value))
                 self.allies[0].update_health(-damage_value)
                 enemy.speed_bar.update_value(-enemy.speed_bar.max_value)
+                self.delay = 30
                 if self.allies[0].health_bar.target_value <= 0:
                     self.allies.remove(self.allies[0])
 
@@ -107,8 +128,6 @@ class Stage:
                 print("enemy " + str(i) + " died")
 
             enemy.speed_bar.update_speed(enemy.unit.stats.speed / 50) # speed coeff
-            enemy.speed_bar.update()
-            enemy.health_bar.update()
 
     def draw(self, surface):
         for enemy in self.enemies:
@@ -116,6 +135,8 @@ class Stage:
 
         for ally in self.allies:
             ally.draw(surface)
+
+        self.end_turn_button.draw(surface)
 
         # Temporary buttons for testing
         for button in self.enemy_buttons:
