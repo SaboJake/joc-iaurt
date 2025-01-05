@@ -1,10 +1,12 @@
 import pygame
+
+from units.unit import Unit
 from utils.health_bar import HealthBar
 from utils.speed_bar import SpeedBar
 
 
 class Enemy:
-    def __init__(self, x, y, width, height, max_health, health_x, health_y, max_speed, name, sprite_paths, death_sprite_paths):
+    def __init__(self, x, y, width, height, max_health, health_x, health_y, max_speed, name, sprite_paths, death_sprite_paths, unit: Unit):
         self.rect = pygame.Rect(x, y, width, height)
         self.health_bar = HealthBar(health_x, health_y, 200, 20, max_health, name)
         self.speed_bar = SpeedBar(x, y - height / 10 - 1, width, height / 10, max_speed)
@@ -16,6 +18,7 @@ class Enemy:
         self.current_frame = 0
         self.animation_speed = 0.1
         self.death_animation_done = False
+        self.unit = unit
 
     def draw(self, surface):
         if self.alive:

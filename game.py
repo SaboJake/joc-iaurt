@@ -1,4 +1,6 @@
 import pygame
+from pygame.examples.midi import NullKey
+
 from utils.button import Button
 from utils.health_bar import HealthBar
 from utils.enemy import Enemy
@@ -35,7 +37,7 @@ heal_button = Button(310, 150, 200, 50, (255, 0, 0, 100), 'Heal', lambda: health
 # Create an enemy with animations
 sprite_paths = ['sprites/enemies/AMOGUS_1.png', 'sprites/enemies/AMOGUS_2.png', 'sprites/enemies/AMOGUS_3.png', 'sprites/enemies/AMOGUS_4.png']
 death_sprite_paths = ['sprites/enemies/AMOGUS_death_1.png', 'sprites/enemies/AMOGUS_death_2.png']
-enemy = Enemy(400, 350, 150, 150, 100, 500, 500, 100, "Amogus", sprite_paths, death_sprite_paths)
+enemy = Enemy(400, 350, 150, 150, 100, 500, 500, 100, "Amogus", sprite_paths, death_sprite_paths, None)
 enemy_damage_button = Button(310, 200, 200, 50, (255, 0, 0, 100), 'Damage Enemy', lambda: enemy.update_health(-10))
 enemy_decrease_speed_button = Button(310, 250, 200, 50, (255, 0, 0, 100), 'Decrease Speed', lambda: enemy.speed_bar.update_value(-10))
 speed_coef = 1 / 5

@@ -25,6 +25,7 @@ class Unit:
             'speed': self.Coeff(),
             'focus': self.Coeff()
         }
+        self.abilities = []
 
     # Should be called every time a coefficient is changed
     def update_stats(self):

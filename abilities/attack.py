@@ -9,17 +9,19 @@ class Attack:
         self.crit_multiplier = crit_multiplier
 
     def attack(self, attacker: Unit, target: Unit):
+        attack_damage = self.damage
         if self.attack_type == "physical":
             self.crit_chance += attacker.stats.physical_piercing / 100
             self.crit_multiplier += attacker.stats.physical_piercing / 100
-            self.damage -= target.stats.physical_defence
+            attack_damage -= target.stats.physical_defence
         elif self.attack_type == "elemental":
             self.crit_chance += attacker.stats.elemental_piercing / 100
             self.crit_multiplier += attacker.stats.elemental_piercing / 100
-            self.damage -= target.stats.elemental_defence
+            attack_damage -= target.stats.elemental_defence
 
-        is_crit = random.randint(1, 100) <= self.crit_chance
+        is_crit = random.randint(1, 100) <= self.crit_chance * 100
         if is_crit:
-            self.damage = self.damage * self.crit_multiplier
+            attack_damage *= self.crit_multiplier
 
-        target.health -= self.damage
+        target.health -= attack_damage
+        return attack_damage
