@@ -81,6 +81,10 @@ class Stage:
         if self.choosing_ability:
             return
 
+        for ally in self.allies:
+            if ally.speed_bar.target_value == ally.speed_bar.max_value:
+                ally.speed_bar.update_speed(-ally.speed_bar.max_value)
+
         # delay after an attack
         if self.delay > 0:
             self.delay -= 1
@@ -89,24 +93,22 @@ class Stage:
         i = 0
         for ally in self.allies:
             i += 1
-
+            # update bars
+            ally.speed_bar.update_speed(ally.unit.stats.speed / 50)
             # if speed bar is charged, attack
             if ally.speed_bar.target_value == ally.speed_bar.max_value:
                 damage_value = ally.unit.abilities[0].hit(ally.unit, self.enemies[0].unit)
                 print("ally " + str(i) + " damage " + str(damage_value))
                 self.enemies[0].update_health(-damage_value)
-                ally.speed_bar.update_value(-ally.speed_bar.max_value)
                 self.choosing_ability = True
                 if self.enemies[0].health_bar.target_value <= 0:
                     self.enemies.remove(self.enemies[0])
+                break
 
             # if ally is dead, remove it
             if ally.health_bar.target_value <= 0:
                 self.allies.remove(ally)
                 print("ally " + str(i) + " died")
-
-            # update bars
-            ally.speed_bar.update_speed(ally.unit.stats.speed / 50)
 
         i = 0
         for enemy in self.enemies:
