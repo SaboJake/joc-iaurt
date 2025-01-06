@@ -23,8 +23,22 @@ class Unit:
             'strength': self.Coeff(),
             'intelligence': self.Coeff(),
             'speed': self.Coeff(),
-            'focus': self.Coeff()
+            'focus': self.Coeff(),
+            'elemental_piercing': self.Coeff(),
+            'physical_piercing': self.Coeff(),
+            'elemental_defence': self.Coeff(),
+            'physical_defence': self.Coeff()
         }
+        # Used for dealing/taking extra damage; may be changed by effects
+        self.damage_mod = 0
+        self.defense_mod = 0
+        # Used for dealing/receiving extra healing; may be changed by effects
+        self.healing_mod = 0
+        self.healing_received_mod = 0
+        # Base crit chance
+        self.crit_chance = 0.05
+
+        # List of abilities
         self.abilities = []
 
     # Should be called every time a coefficient is changed
@@ -34,6 +48,10 @@ class Unit:
         self.stats.intelligence = self.coeffs['intelligence'].update(self.base_stats.intelligence)
         self.stats.speed = self.coeffs['speed'].update(self.base_stats.speed)
         self.stats.focus = self.coeffs['focus'].update(self.base_stats.focus)
+        self.stats.elemental_piercing = self.coeffs['elemental_piercing'].update(self.base_stats.elemental_piercing)
+        self.stats.physical_piercing = self.coeffs['physical_piercing'].update(self.base_stats.physical_piercing)
+        self.stats.elemental_defence = self.coeffs['elemental_defence'].update(self.base_stats.elemental_defence)
+        self.stats.physical_defence = self.coeffs['physical_defence'].update(self.base_stats.physical_defence)
 
     def add_effect(self, effect):
         self.effects.append(effect)
