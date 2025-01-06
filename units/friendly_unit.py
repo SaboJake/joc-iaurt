@@ -10,3 +10,6 @@ class FriendlyUnit(Unit):
     def add_item(self, item):
         self.items.append(item)
         self.base_stats += item.stats
+
+    def is_enemy(self):
+        return False

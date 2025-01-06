@@ -7,3 +7,20 @@ class Ability:
         self.cost = cost
         # self, ally, enemy or all
         self.target = target
+
+    def use(self, user, target):
+        if user.stats.focus < self.cost:
+            return 0
+        if not self.check_valid_target(user, target):
+            return 0
+        user.stats.focus -= self.cost
+        return 1
+
+    def check_valid_target(self, user, target):
+        if self.target == 'self' and user != target:
+            return False
+        if self.target == 'ally' and target.is_enemy:
+            return False
+        if self.target == 'enemy' and not target.is_enemy:
+            return False
+        return True

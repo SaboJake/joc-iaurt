@@ -54,7 +54,16 @@ class Unit:
         self.stats.physical_defence = self.coeffs['physical_defence'].update(self.base_stats.physical_defence)
 
     def add_effect(self, effect):
-        self.effects.append(effect)
+        # if effect can stack just add it
+        if effect.can_stack:
+            self.effects.append(effect)
+        else:
+            # if effect can't stack, remove all previous effects of the same type
+            for e in self.effects:
+                if e.name == effect.name:
+                    e.remove(self)
+                    self.effects.remove(e)
+            self.effects.append(effect)
 
     def apply_effects(self):
         for effect in self.effects:
@@ -63,3 +72,6 @@ class Unit:
             if effect.duration == 0:
                 effect.remove(self)
                 self.effects.remove(effect)
+
+    def is_enemy(self):
+        return True
