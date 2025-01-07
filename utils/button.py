@@ -26,6 +26,9 @@ class Button():
             if not self.hovering and self.hover_action:
                 self.hover_action()
             self.hovering = True
+
+            if pygame.mouse.get_pressed()[0] == 1 and self.clicked == False:
+                self.clicked = True
         else:
             if self.hovering and self.leave_action:
                 self.leave_action()
