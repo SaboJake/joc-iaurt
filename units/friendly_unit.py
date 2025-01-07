@@ -18,3 +18,6 @@ class FriendlyUnit(Unit):
 
     def is_enemy(self):
         return False
+
+    def is_player(self):
+        return False

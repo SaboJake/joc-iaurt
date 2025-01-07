@@ -1,4 +1,5 @@
 import pygame
+import switch
 from pygame.examples.midi import NullKey
 
 from utils.button import Button
@@ -42,24 +43,29 @@ enemy_damage_button = Button(310, 200, 200, 50, (255, 0, 0, 100), 'Damage Enemy'
 enemy_decrease_speed_button = Button(310, 250, 200, 50, (255, 0, 0, 100), 'Decrease Speed', lambda: enemy.speed_bar.update_value(-10))
 speed_coef = 1 / 5
 
-# Create stage with enemies
+# Create stage
 stage = None
-stage_active = False
+stage_no = 0
+
+game_state = "main_menu"
 
 def start_stage():
-    global stage
+    global stage, game_state, stage_no
     names_array = ["Amogus", "Amogus", "Amogus"]
     clas_array = ["am", "og", "us"]
     sprite_paths_array = [sprite_paths, sprite_paths, sprite_paths]
     death_sprite_paths_array = [death_sprite_paths, death_sprite_paths, death_sprite_paths]
-    stage = Stage(names_array, clas_array, sprite_paths_array, death_sprite_paths_array)
+    stage = Stage(names_array, clas_array, sprite_paths_array, death_sprite_paths_array, stage_no)
     global stage_active
-    stage_active = True
+    game_state = "stage"
 
 start_stage_button = Button(100, 200, 200, 100, (255, 0, 0, 100), 'Start Stage', lambda: start_stage())
 
+next_stage_button = Button(200, 200, 200, 100, (255, 0, 0, 100), 'Next Stage', lambda: start_stage())
+
 # Load the background image
-background_image = pygame.image.load('sprites/backgrounds/Untitled.png')
+background_image = pygame.image.load('sprites/backgrounds/stage_background.png')
+game_menu_background = pygame.image.load('sprites/backgrounds/game_menu_background.png')
 
 # Draw the game
 def draw_game():
@@ -72,6 +78,9 @@ def draw_game():
     enemy_decrease_speed_button.draw(surface)
     start_stage_button.draw(surface)
 
+def draw_game_menu():
+    next_stage_button.draw(screen)
+
 while running:
     # Cap the frame rate
     clock.tick(60)
@@ -80,7 +89,7 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-        if stage_active:
+        if game_state == "stage":
             stage.inventory_event_handler(event, screen)
 
     # Update the game
@@ -94,26 +103,38 @@ while running:
     if keys[pygame.K_DOWN]:
         player.y += 5
 
-    if stage_active:
-        # Update the stage
-        stage.update()
-        if stage.all_enemies_dead():
-            stage_active = False
-    else:
-        # Update the main game
+    # Draw the game
+    screen.fill(BLACK)
+
+    if game_state == "main_menu":
+        # temporary stuff
         enemy.speed_bar.update_speed(speed_coef)
         enemy.speed_bar.update()
         enemy.health_bar.update()
         health_bar.update()
 
-    # Draw the game
-    screen.fill(BLACK)
-    if stage_active:
-        screen.blit(background_image, (0, 0))
-        stage.draw(screen)
-    else:
+        # Draw the game
         screen.blit(surface, (0, 0))
         draw_game()
+
+    elif game_state == "stage":
+        # Update the stage
+        stage.update()
+        if stage.all_enemies_dead():
+            stage_no += 1
+            game_state = "game_menu"
+        if stage.player_dead():
+            game_state = "game_menu"
+
+        # Draw the stage
+        screen.blit(background_image, (0, 0))
+        stage.draw(screen)
+
+    elif game_state == "game_menu":
+        # Draw the game menu
+        screen.blit(game_menu_background, (0, 0))
+        draw_game_menu()
+
     pygame.display.flip()
 
 # Quit the game

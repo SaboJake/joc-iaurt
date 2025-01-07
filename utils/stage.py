@@ -6,6 +6,7 @@ import pygame
 from abilities.ability_sprite import AbilitySprite
 from abilities.basic_attack import BasicAttack
 from abilities.basic_heal import BasicHeal
+from units.player_unit import PlayerUnit
 from utils.button import Button
 from utils.enemy import Enemy
 from units.unit import Unit
@@ -34,12 +35,16 @@ coeffs = {
 }
 
 class Stage:
-    def __init__(self, names_array, clas_array, sprite_paths_array, death_sprite_paths_array):
+    def __init__(self, names_array, clas_array, sprite_paths_array, death_sprite_paths_array, stage_no):
         # add allies
         allies = []
         ally_units = []
         for i in range(len(names_array)):
-            ally_units.append(FriendlyUnit(names_array[i], clas_array[i], Stats(10, 10, 10, 25 + (3 - i) * 5, 10), Stats(10, 10, 10, 25 + (3 - i) * 5, 10)))
+            # first unit is the player
+            if i == 0:
+                ally_units.append(PlayerUnit(names_array[i], clas_array[i], Stats(10, 10, 10, 25 + (3 - i) * 5, 10), Stats(10, 10, 10, 25 + (3 - i) * 5, 10)))
+            else:
+                ally_units.append(FriendlyUnit(names_array[i], clas_array[i], Stats(10, 10, 10, 25 + (3 - i) * 5, 10), Stats(10, 10, 10, 25 + (3 - i) * 5, 10)))
             ally_units[i].abilities.append(BasicAttack(coeffs, "attack", "WHO CARES", 0, 0, "physical", 'sprites/abilities/slash.png'))
             ally_units[i].abilities.append(BasicHeal(coeffs, "heal", "WHO CARES", 0, 0, "physical", 'sprites/abilities/heal.png'))
 
@@ -124,21 +129,14 @@ class Stage:
         abilities = self.allies[0].unit.abilities
         self.ability_sprites.empty()
 
-        usable_abilities = []
-        for ability in abilities:
-            if self.selected_enemy is not None and ability.target == "enemy":
-                usable_abilities.append(ability)
-            elif self.selected_ally is not None and ability.target == "ally":
-                usable_abilities.append(ability)
-
         radius = 100
-        for i, ability in enumerate(usable_abilities):
-            angle = 2 * math.pi * i / len(usable_abilities)
+        for i, ability in enumerate(abilities):
+            angle = 2 * math.pi * i / len(abilities)
             x = y = 0
-            if self.selected_enemy is not None and ability.target == "enemy":
+            if self.selected_enemy is not None:
                 x = self.selected_enemy.rect.x + self.selected_enemy.rect.width / 2 + math.sin(angle) * radius
                 y = self.selected_enemy.rect.y + self.selected_enemy.rect.height / 2 + math.cos(angle) * radius
-            elif self.selected_ally is not None and ability.target == "ally":
+            elif self.selected_ally is not None:
                 x = self.selected_ally.rect.x + self.selected_ally.rect.width / 2 + math.sin(angle) * radius
                 y = self.selected_ally.rect.y + self.selected_ally.rect.height / 2 + math.cos(angle) * radius
             sprite = AbilitySprite(x, y, 50, 50, (255, 0, 0, 100), ability, ability.sprite_path)
@@ -147,12 +145,16 @@ class Stage:
     def use_ability(self, ability):
         self.selected_ability = ability
         if self.selected_enemy is not None:
+            if ability.target != "enemy":
+                return
             damage_value = self.selected_ability.use(self.allies[0].unit, self.selected_enemy.unit)
             print("used ability on enemy, damage:", damage_value)
             self.selected_enemy.update_health(-damage_value)
             if self.selected_enemy.health_bar.target_value <= 0:
                 self.enemies.remove(self.selected_enemy)
         elif self.selected_ally is not None:
+            if ability.target != "ally":
+                return
             heal_value = self.selected_ability.use(self.allies[0].unit, self.selected_ally.unit)
             print("used ability on ally, heal:", heal_value)
             self.selected_ally.update_health(heal_value)
@@ -330,3 +332,7 @@ class Stage:
 
     def all_enemies_dead(self):
         return all(not enemy.alive for enemy in self.enemies)
+
+    def player_dead(self):
+        # if a unit dies, it is removed from its list, so if the fist unit is not the player, he died
+        return not self.allies[0].alive

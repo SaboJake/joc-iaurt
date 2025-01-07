@@ -76,3 +76,6 @@ class Unit:
 
     def is_enemy(self):
         return True
+
+    def is_player(self):
+        return False
