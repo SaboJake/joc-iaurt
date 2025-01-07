@@ -12,11 +12,12 @@ class Unit:
         def update(self, value: int) -> int:
             return (value + self.additive) * self.multi + self.true
 
-    def __init__(self, name, base_stats: Stats, stats: Stats):
+    def __init__(self, name, base_stats: Stats, stats: Stats, level = 1):
         self.name = name
         self.stats = stats
         self.base_stats = base_stats
         self.health = stats.vitality * self.BASE_HEALTH_COEF
+        self.level = level
         self.effects = []
         self.coeffs = {
             'vitality': self.Coeff(),
