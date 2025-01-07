@@ -1,3 +1,3 @@
 
 friendly_units = {}
-money = 0
+money = 100

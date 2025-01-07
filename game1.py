@@ -2,25 +2,8 @@ import pygame
 pygame.init()
 
 from utils.status_bar import StatusBar
+from utils.button import Button  # Import the Button class from utils
 from inventory import inventory_logic, inventory_event_handler
-
-class Button:
-    def __init__(self, x, y, width, height, color, text='', action=None):
-        self.rect = pygame.Rect(x, y, width, height)
-        self.color = color
-        self.text = text
-        self.action = action
-
-    def draw(self, surface):
-        pygame.draw.rect(surface, self.color, self.rect)
-        font = pygame.font.Font(None, 36)
-        text_surface = font.render(self.text, True, (255, 255, 255))
-        surface.blit(text_surface, (self.rect.x + (self.rect.width - text_surface.get_width()) // 2,
-                                    self.rect.y + (self.rect.height - text_surface.get_height()) // 2))
-
-    def click(self):
-        if self.action:
-            self.action()
 
 def inventory_screen():
     status_bar.current_screen = "inventory"

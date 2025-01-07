@@ -4,7 +4,9 @@ from items.display_item import DisplayItem
 from items.item import Item
 from units.friendly_unit import FriendlyUnit
 from utils.stats import Stats
+from utils.button import Button
 from globals import friendly_units
+
 
 # Add sample unit to friendly_units
 unit_stats1 = Stats(10, 10, 10, 10, 10)
@@ -30,7 +32,7 @@ OFFSET_X = 800
 OFFSET_Y = 100
 
 # Equipment slots
-EQUIPMENT_SLOTS = {
+equipment_slots = {
     "helmet": (100, 200),
     "gloves": (100, 276),
     "weapon1": (176, 352),
@@ -39,6 +41,12 @@ EQUIPMENT_SLOTS = {
     "legs": (400, 276),
     "boots": (400, 352),
 }
+
+def set_equipment_slots(slots):
+    global equipment_slots
+    equipment_slots = slots
+
+set_equipment_slots(equipment_slots)
 
 # Initialize screen
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
@@ -50,6 +58,14 @@ inventory = [[None for _ in range(GRID_COLS)] for _ in range(GRID_ROWS)]
 selected_item = None  # Holds the selected item
 selected_item_pos = None  # Original position of the selected item
 
+def set_selected_item(item):
+    global selected_item
+    selected_item = item
+
+def get_selected_item():
+    global selected_item
+    return selected_item
+
 # Fill some slots with items (example data)
 sample_stats = Stats(10, 10, 10, 10, 10)
 tricou = DisplayItem(Item("Tricou", "Tricou funny", "armor", sample_stats, 0, 0), "sprites/items/tricou_gucci.png")
@@ -59,7 +75,7 @@ inventory[1][1] = tricou
 inventory[2][2] = tricou
 
 # Equipment setup
-equipment = {slot: None for slot in EQUIPMENT_SLOTS}
+equipment = {slot: None for slot in equipment_slots}
 
 def draw_inventory(surface, inventory, selected_item):
     """Draw the inventory grid and items."""
@@ -77,8 +93,8 @@ def draw_inventory(surface, inventory, selected_item):
 
 # Initialize equipment for each unit
 unit_equipment = {
-    "Player": {slot: None for slot in EQUIPMENT_SLOTS},
-    "Ally1": {slot: None for slot in EQUIPMENT_SLOTS}
+    "Player": {slot: None for slot in equipment_slots},
+    "Ally1": {slot: None for slot in equipment_slots}
 }
 
 def draw_equipment_background(surface, x, y, width, height):
@@ -88,7 +104,7 @@ def draw_equipment_background(surface, x, y, width, height):
 
 def draw_equipment(surface, equipment):
     """Draw the equipment slots and items."""
-    for slot, (x, y) in EQUIPMENT_SLOTS.items():
+    for slot, (x, y) in equipment_slots.items():
         # Draw slot
         pygame.draw.rect(surface, SLOT_COLOR, (x, y, SLOT_SIZE, SLOT_SIZE), 2)
 
@@ -166,7 +182,7 @@ def get_slot_at_mouse(pos):
 def get_equipment_slot_at_mouse(pos):
     """Get the equipment slot at a mouse position."""
     x, y = pos
-    for slot, (slot_x, slot_y) in EQUIPMENT_SLOTS.items():
+    for slot, (slot_x, slot_y) in equipment_slots.items():
         if slot_x <= x < slot_x + SLOT_SIZE and slot_y <= y < slot_y + SLOT_SIZE:
             return slot
     return None
@@ -198,27 +214,72 @@ BUTTON_OFFSET_Y = 450
 player_button_pos = (100, BUTTON_OFFSET_Y)
 ally1_button_pos = (300, BUTTON_OFFSET_Y)
 
-# Current unit to display equipment
-current_unit = "Player"
+DELETE_BUTTON_WIDTH, DELETE_BUTTON_HEIGHT = SLOT_SIZE, SLOT_SIZE
+DELETE_BUTTON_COLOR = (255, 0, 0)
+# Define button position
+delete_button_pos = (OFFSET_X + (GRID_COLS - 1) * SLOT_SIZE, OFFSET_Y + GRID_ROWS * SLOT_SIZE + 10)
 
-def draw_button(surface, text, pos):
-    """Draw a button with text."""
-    font = pygame.font.Font(None, 36)
-    x, y = pos
-    pygame.draw.rect(surface, BUTTON_COLOR, (x, y, BUTTON_WIDTH, BUTTON_HEIGHT))
-    text_surface = font.render(text, True, BUTTON_TEXT_COLOR)
-    surface.blit(text_surface, (x + (BUTTON_WIDTH - text_surface.get_width()) // 2, y + (BUTTON_HEIGHT - text_surface.get_height()) // 2))
+def delete_selected_item():
+    global selected_item, selected_item_pos
+    if selected_item:
+        selected_item = None
+        selected_item_pos = None
+        print("Deleted selected item")
 
-def is_button_clicked(pos, button_pos):
-    """Check if a button is clicked."""
-    x, y = pos
-    bx, by = button_pos
-    return bx <= x <= bx + BUTTON_WIDTH and by <= y <= by + BUTTON_HEIGHT
+delete_message = None
+
+def display_delete_message():
+    global delete_message
+    delete_message = "Delete item"
+
+def clear_delete_message():
+    global delete_message
+    delete_message = None
+
+# Initialize delete button with hover and leave actions
+delete_button = Button(
+    delete_button_pos[0], delete_button_pos[1], DELETE_BUTTON_WIDTH, DELETE_BUTTON_HEIGHT,
+    DELETE_BUTTON_COLOR, 'X', lambda: delete_selected_item(), display_delete_message, clear_delete_message
+)
+
+# Initialize buttons using the Button class from utils
+player_button = Button(player_button_pos[0], player_button_pos[1], BUTTON_WIDTH, BUTTON_HEIGHT, BUTTON_COLOR, 'Player', lambda: set_current_unit("Player"))
+ally1_button = Button(ally1_button_pos[0], ally1_button_pos[1], BUTTON_WIDTH, BUTTON_HEIGHT, BUTTON_COLOR, 'Ally1', lambda: set_current_unit("Ally1"))
+
+def set_current_unit(unit_name):
+    global current_unit
+    current_unit = unit_name
+
+from globals import money
 
 running = True
 error_message = None
 error_message_pos = None
 error_message_timer = 0
+
+def regular_slot_logic(slot):
+    global selected_item, selected_item_pos
+    row, col = slot
+    if selected_item is None:
+        # Pick up item
+        if inventory[row][col]:
+            selected_item = inventory[row][col]
+            selected_item_pos = (row, col)
+            inventory[row][col] = None
+            print("Selected item:", selected_item)
+    else:
+        # Place item
+        if inventory[row][col] is None:
+            inventory[row][col] = selected_item
+            selected_item = None
+            selected_item_pos = None
+            print("Placed item in slot:", slot)
+        else:
+            # Swap items
+            tmp = inventory[row][col]
+            inventory[row][col] = selected_item
+            selected_item = tmp
+            print("Swapped items:", slot)
 
 def inventory_event_handler(event):
     global running, current_unit, selected_item, selected_item_pos, error_message, error_message_pos, error_message_timer
@@ -229,28 +290,9 @@ def inventory_event_handler(event):
         slot = get_slot_at_mouse(mouse_pos)
         equipment_slot = get_equipment_slot_at_mouse(mouse_pos)
         print("Slot:", slot, "Equipment Slot:", equipment_slot)
+        print("Selected item:", selected_item)
         if slot:
-            row, col = slot
-            if selected_item is None:
-                # Pick up item
-                if inventory[row][col]:
-                    selected_item = inventory[row][col]
-                    selected_item_pos = (row, col)
-                    inventory[row][col] = None
-                    print("Selected item:", selected_item)
-            else:
-                # Place item
-                if inventory[row][col] is None:
-                    inventory[row][col] = selected_item
-                    selected_item = None
-                    selected_item_pos = None
-                    print("Placed item in slot:", slot)
-                else:
-                    # Swap items
-                    tmp = inventory[row][col]
-                    inventory[row][col] = selected_item
-                    selected_item = tmp
-                    print("Swapped items:", slot)
+            regular_slot_logic(slot)
         elif equipment_slot:
             if selected_item is None:
                 # Pick up item
@@ -281,14 +323,41 @@ def inventory_event_handler(event):
                     selected_item = tmp
                     friendly_units.get(current_unit).add_item(selected_item.item)
                     print("Swapped items in equipment slot:", equipment_slot)
+    player_button.handle_event(event)
+    ally1_button.handle_event(event)
+    delete_button.handle_event(event)
 
-    # Handle button clicks
-    if event.type == pygame.MOUSEBUTTONDOWN:
-        mouse_pos = pygame.mouse.get_pos()
-        if is_button_clicked(mouse_pos, player_button_pos):
-            current_unit = "Player"
-        elif is_button_clicked(mouse_pos, ally1_button_pos):
-            current_unit = "Ally1"
+def draw_money(surface, money, pos):
+    """Draw the current money on the screen."""
+    font = pygame.font.Font(None, 36)
+    text_surface = font.render(f"Money: {money}", True, (255, 255, 0))
+    surface.blit(text_surface, pos)
+
+def draw_item_info_logic():
+    mouse_pos = pygame.mouse.get_pos()
+    slot = get_slot_at_mouse(mouse_pos)
+    equipment_slot = get_equipment_slot_at_mouse(mouse_pos)
+    if slot and selected_item is None:
+        row, col = slot
+        if inventory[row][col]:
+            draw_item_info(screen, inventory[row][col].item, mouse_pos)
+    elif equipment_slot and selected_item is None:
+        if unit_equipment[current_unit][equipment_slot]:
+            draw_item_info(screen, unit_equipment[current_unit][equipment_slot].item, mouse_pos)
+
+def draw_item_following_mouse():
+    global selected_item
+    if selected_item:
+        mouse_x, mouse_y = pygame.mouse.get_pos()
+        item_sprite = pygame.image.load(selected_item.sprite)
+        item_sprite = pygame.transform.scale(item_sprite, (SLOT_SIZE, SLOT_SIZE))
+        screen.blit(item_sprite, (mouse_x - SLOT_SIZE // 2, mouse_y - SLOT_SIZE // 2))
+
+def draw_delete_logic():
+    global delete_message
+    if delete_message:
+        mouse_x, mouse_y = pygame.mouse.get_pos()
+        draw_error_message(screen, delete_message, (mouse_x - 30, mouse_y))
 
 def inventory_logic():
     global running, current_unit, selected_item, selected_item_pos, error_message, error_message_pos, error_message_timer
@@ -296,9 +365,13 @@ def inventory_logic():
     # Draw the inventory grid
     draw_inventory(screen, inventory, selected_item)
 
+    # Draw money value
+    draw_money(screen, money, (OFFSET_X, OFFSET_Y + GRID_ROWS * SLOT_SIZE + 10))
+
     # Draw buttons
-    draw_button(screen, "Player", player_button_pos)
-    draw_button(screen, "Ally1", ally1_button_pos)
+    player_button.draw(screen)
+    ally1_button.draw(screen)
+    delete_button.draw(screen)
 
     equipment_bg_x, equipment_bg_y = 50, 150
     equipment_bg_width, equipment_bg_height = 500, 300
@@ -313,30 +386,23 @@ def inventory_logic():
     # Draw player stats for the current unit
     draw_player_stats(screen, friendly_units.get(current_unit))
 
+    # Draw money value
+    draw_money(screen, money, (OFFSET_X, OFFSET_Y + GRID_ROWS * SLOT_SIZE + 10))
     # Draw item info if hovering over an item and no item is selected
-    mouse_pos = pygame.mouse.get_pos()
-    slot = get_slot_at_mouse(mouse_pos)
-    equipment_slot = get_equipment_slot_at_mouse(mouse_pos)
-    if slot and selected_item is None:
-        row, col = slot
-        if inventory[row][col]:
-            draw_item_info(screen, inventory[row][col].item, mouse_pos)
-    elif equipment_slot and selected_item is None:
-        if unit_equipment[current_unit][equipment_slot]:
-            draw_item_info(screen, unit_equipment[current_unit][equipment_slot].item, mouse_pos)
+    draw_item_info_logic()
 
     # Draw the selected item following the mouse
-    if selected_item:
-        mouse_x, mouse_y = pygame.mouse.get_pos()
-        item_sprite = pygame.image.load(selected_item.sprite)
-        item_sprite = pygame.transform.scale(item_sprite, (SLOT_SIZE, SLOT_SIZE))
-        screen.blit(item_sprite, (mouse_x - SLOT_SIZE // 2, mouse_y - SLOT_SIZE // 2))
+    draw_item_following_mouse()
 
     # Draw error message if exists
     if error_message and pygame.time.get_ticks() - error_message_timer < 1000:  # Display for 1 second
         draw_error_message(screen, error_message, error_message_pos)
     else:
         error_message = None
+    # Draw delete message if hovering over the delete button
+    draw_delete_logic()
+
+current_unit = "Player"
 
 if __name__ == "__main__":
     while running:
