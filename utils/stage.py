@@ -1,5 +1,9 @@
+import random
+
 import pygame
 
+from abilities.basic_attack import BasicAttack
+from abilities.basic_heal import BasicHeal
 from utils.button import Button
 from utils.enemy import Enemy
 from units.unit import Unit
@@ -21,14 +25,21 @@ enemy_height = 150
 enemy_health_x = [750, 750, 750]
 enemy_health_y = [10, 40, 70]
 
+coeffs = {
+    'strength': 1,
+    'intelligence': 1,
+    'speed': 1
+}
+
 class Stage:
     def __init__(self, names_array, sprite_paths_array, death_sprite_paths_array):
         # add allies
         allies = []
         ally_units = []
         for i in range(len(names_array)):
-            ally_units.append(FriendlyUnit(names_array[i], Stats(10, 10, 10, 50 + i * 5, 10), Stats(10, 10, 10, 50 + i * 5, 10)))
-            ally_units[i].abilities.append(SlashAbility())
+            ally_units.append(FriendlyUnit(names_array[i], Stats(10, 10, 10, 25 + i * 6, 10), Stats(10, 10, 10, 25 + i * 5, 10)))
+            ally_units[i].abilities.append(BasicAttack(coeffs, "WHO", "CARES", 0, 0, "physical"))
+            ally_units[i].abilities.append(BasicHeal(coeffs, "WHO", "CARES", 0, 0, "physical"))
 
         # nu uita sa schimbi numele la enemy ca gen e doar unit cu tot cu bari si e stupid
         if len(names_array) == 2:
@@ -44,7 +55,8 @@ class Stage:
         enemy_units = []
         for i in range(len(names_array)):
             enemy_units.append(Unit(names_array[i], Stats(10, 10, 10, 25 + i * 5, 10), Stats(10, 10, 10, 25 + i * 5, 10)))
-            enemy_units[i].abilities.append(SlashAbility())
+            enemy_units[i].abilities.append(BasicAttack(coeffs, "WHO", "CARES", 0, 0, "physical"))
+            enemy_units[i].abilities.append(BasicHeal(coeffs, "WHO", "CARES", 0, 0, "physical"))
 
         if len(names_array) == 2:
             for i in range(len(names_array)):
@@ -67,6 +79,73 @@ class Stage:
         self.delay = 0
         self.choosing_ability = False
         self.end_turn_button = Button(475, 650, 50, 50, (255, 0, 0, 100), 'End Turn', lambda: setattr(self, 'choosing_ability', False))
+
+    def ally_action(self, ally):
+
+        # if other allies are low on health, help them
+        target = None
+        for j in range(len(self.allies)):
+            if self.allies[j] != ally and self.allies[j].health_bar.target_value < self.allies[j].health_bar.max_value / 2:
+                target = self.allies[j]
+                break
+
+        if target is not None:
+            # found a target, heal it
+            # random heal ability
+            ability = ally.unit.abilities[random.randint(0, len(ally.unit.abilities) - 1)]
+            while ability.target != "ally":
+                ability = ally.unit.abilities[random.randint(0, len(ally.unit.abilities) - 1)]
+
+            heal_value = ability.use(ally.unit, target.unit)
+            print("ally " + str(ally) + " heal " + str(heal_value))
+            target.update_health(heal_value)
+
+        else:
+            # random attack ability
+            ability = ally.unit.abilities[random.randint(0, len(ally.unit.abilities) - 1)]
+            while ability.target != "enemy":
+                ability = ally.unit.abilities[random.randint(0, len(ally.unit.abilities) - 1)]
+
+            # random target
+            target = self.enemies[random.randint(0, len(self.enemies) - 1)]
+            damage_value = ability.use(ally.unit, target.unit)
+            print("ally " + str(ally) + " damage " + str(damage_value))
+            target.update_health(-damage_value)
+            if target.health_bar.target_value <= 0:
+                self.enemies.remove(target)
+
+    def enemy_action(self, enemy):
+
+        # if other enemies are low on health, help them (50% chance)
+        target = None
+        for j in range(len(self.enemies)):
+            if self.enemies[j] != enemy and self.enemies[j].health_bar.target_value < self.enemies[j].health_bar.max_value / 2 and random.randint(0, 1) == 0:
+                target = self.enemies[j]
+                break
+
+        # found a target, heal it
+        if target is not None:
+            ability = enemy.unit.abilities[random.randint(0, len(enemy.unit.abilities) - 1)]
+            while ability.target != "ally":
+                ability = enemy.unit.abilities[random.randint(0, len(enemy.unit.abilities) - 1)]
+
+            heal_value = ability.use(enemy.unit, target.unit)
+            print("enemy " + str(enemy) + " heal " + str(heal_value))
+            target.update_health(heal_value)
+
+        else:
+            # random attack ability
+            ability = enemy.unit.abilities[random.randint(0, len(enemy.unit.abilities) - 1)]
+            while ability.target != "enemy":
+                ability = enemy.unit.abilities[random.randint(0, len(enemy.unit.abilities) - 1)]
+
+            # random target
+            target = self.allies[random.randint(0, len(self.allies) - 1)]
+            damage_value = ability.use(enemy.unit, target.unit)
+            print("ally " + str(enemy) + " damage " + str(damage_value))
+            target.update_health(-damage_value)
+            if target.health_bar.target_value <= 0:
+                self.allies.remove(target)
 
     def update(self):
         for ally in self.allies:
@@ -93,17 +172,31 @@ class Stage:
         i = 0
         for ally in self.allies:
             i += 1
-            # update bars
+
+            # update speed bar
             ally.speed_bar.update_speed(ally.unit.stats.speed / 50)
+
             # if speed bar is charged, attack
             if ally.speed_bar.target_value == ally.speed_bar.max_value:
-                damage_value = ally.unit.abilities[0].hit(ally.unit, self.enemies[0].unit)
-                print("ally " + str(i) + " damage " + str(damage_value))
-                self.enemies[0].update_health(-damage_value)
-                self.choosing_ability = True
-                if self.enemies[0].health_bar.target_value <= 0:
-                    self.enemies.remove(self.enemies[0])
-                break
+
+                # wait for the player (first friendly unit) to choose an ability
+                if i == 1:
+                    self.choosing_ability = True
+                    # temporary ability
+                    damage_value = ally.unit.abilities[0].use(ally.unit, self.enemies[0].unit)
+                    print("ally " + str(i) + " damage " + str(damage_value))
+                    self.enemies[0].update_health(-damage_value)
+                    if self.enemies[0].health_bar.target_value <= 0:
+                        self.enemies.remove(self.enemies[0])
+                    self.delay = 60
+                    return
+
+                # ally ai
+                self.ally_action(ally)
+
+                ally.speed_bar.update_value(-ally.speed_bar.max_value)
+                self.delay = 60
+                return
 
             # if ally is dead, remove it
             if ally.health_bar.target_value <= 0:
@@ -114,22 +207,22 @@ class Stage:
         for enemy in self.enemies:
             i += 1
 
+            enemy.speed_bar.update_speed(enemy.unit.stats.speed / 50) # speed coeff
+
             # if speed bar is charged, attack
             if enemy.speed_bar.target_value == enemy.speed_bar.max_value:
-                damage_value = enemy.unit.abilities[0].hit(enemy.unit, self.allies[0].unit)
-                print("enemy " + str(i) + " damage " + str(damage_value))
-                self.allies[0].update_health(-damage_value)
+
+                # enemy ai
+                self.enemy_action(enemy)
+
                 enemy.speed_bar.update_value(-enemy.speed_bar.max_value)
-                self.delay = 30
-                if self.allies[0].health_bar.target_value <= 0:
-                    self.allies.remove(self.allies[0])
+                self.delay = 60
+                return
 
             # if enemy is dead, remove it
             if enemy.health_bar.target_value <= 0:
                 self.enemies.remove(enemy)
                 print("enemy " + str(i) + " died")
-
-            enemy.speed_bar.update_speed(enemy.unit.stats.speed / 50) # speed coeff
 
     def draw(self, surface):
         for enemy in self.enemies:

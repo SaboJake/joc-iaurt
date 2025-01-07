@@ -11,12 +11,13 @@ class Ability:
     def use(self, user, target):
         if user.stats.focus < self.cost:
             return 0
-        if not self.check_valid_target(user, target):
-            return 0
+        # if not self.check_valid_target(user, target):
+        #     return 0 # gen verific eu sa atace ce trebuie si ma enerva ca voiam sa dea si inamicii heal si se futea
         user.stats.focus -= self.cost
         return 1
 
     def check_valid_target(self, user, target):
+        print(self.target)
         if self.target == 'self' and user != target:
             return False
         if self.target == 'ally' and target.is_enemy:

@@ -13,7 +13,7 @@ class BasicHeal(Ability):
         self.element = element
 
     def use(self, user, target):
-        if not super.use(user, target):
+        if not super().use(user, target):
             return 0
         heal = user.stats.strength * self.coeffs['strength'] + user.stats.intelligence * self.coeffs['intelligence'] + user.stats.speed * self.coeffs['speed']
         crit = user.crit_chance
