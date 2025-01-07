@@ -1,7 +1,9 @@
+import math
 import random
 
 import pygame
 
+from abilities.ability_sprite import AbilitySprite
 from abilities.basic_attack import BasicAttack
 from abilities.basic_heal import BasicHeal
 from utils.button import Button
@@ -32,14 +34,22 @@ coeffs = {
 }
 
 class Stage:
-    def __init__(self, names_array, sprite_paths_array, death_sprite_paths_array):
+    def __init__(self, names_array, clas_array, sprite_paths_array, death_sprite_paths_array):
         # add allies
         allies = []
         ally_units = []
         for i in range(len(names_array)):
-            ally_units.append(FriendlyUnit(names_array[i], Stats(10, 10, 10, 25 + i * 6, 10), Stats(10, 10, 10, 25 + i * 5, 10)))
-            ally_units[i].abilities.append(BasicAttack(coeffs, "WHO", "CARES", 0, 0, "physical"))
-            ally_units[i].abilities.append(BasicHeal(coeffs, "WHO", "CARES", 0, 0, "physical"))
+            ally_units.append(FriendlyUnit(names_array[i], clas_array[i], Stats(10, 10, 10, 25 + (3 - i) * 5, 10), Stats(10, 10, 10, 25 + (3 - i) * 5, 10)))
+            ally_units[i].abilities.append(BasicAttack(coeffs, "attack", "WHO CARES", 0, 0, "physical", 'sprites/abilities/slash.png'))
+            ally_units[i].abilities.append(BasicHeal(coeffs, "heal", "WHO CARES", 0, 0, "physical", 'sprites/abilities/heal.png'))
+
+        ally_units[0].abilities.append(BasicAttack(coeffs, "attack", "WHO CARES", 0, 0, "physical", 'sprites/abilities/slash.png'))
+        ally_units[0].abilities.append(BasicAttack(coeffs, "attack", "WHO CARES", 0, 0, "physical", 'sprites/abilities/slash.png'))
+        ally_units[0].abilities.append(BasicAttack(coeffs, "attack", "WHO CARES", 0, 0, "physical", 'sprites/abilities/slash.png'))
+        ally_units[0].abilities.append(BasicAttack(coeffs, "attack", "WHO CARES", 0, 0, "physical", 'sprites/abilities/slash.png'))
+        ally_units[0].abilities.append(BasicAttack(coeffs, "attack", "WHO CARES", 0, 0, "physical", 'sprites/abilities/slash.png'))
+        ally_units[0].abilities.append(BasicAttack(coeffs, "attack", "WHO CARES", 0, 0, "physical", 'sprites/abilities/slash.png'))
+
 
         # nu uita sa schimbi numele la enemy ca gen e doar unit cu tot cu bari si e stupid
         if len(names_array) == 2:
@@ -55,8 +65,8 @@ class Stage:
         enemy_units = []
         for i in range(len(names_array)):
             enemy_units.append(Unit(names_array[i], Stats(10, 10, 10, 25 + i * 5, 10), Stats(10, 10, 10, 25 + i * 5, 10)))
-            enemy_units[i].abilities.append(BasicAttack(coeffs, "WHO", "CARES", 0, 0, "physical"))
-            enemy_units[i].abilities.append(BasicHeal(coeffs, "WHO", "CARES", 0, 0, "physical"))
+            enemy_units[i].abilities.append(BasicAttack(coeffs, "WHO", "CARES", 0, 0, "physical", 'sprites/abilities/slash.png'))
+            enemy_units[i].abilities.append(BasicHeal(coeffs, "WHO", "CARES", 0, 0, "physical", 'sprites/abilities/heal.png'))
 
         if len(names_array) == 2:
             for i in range(len(names_array)):
@@ -69,16 +79,91 @@ class Stage:
         self.enemies = enemies
         self.allies = allies
 
-        # Temporary buttons for testing
-        enemy_buttons = []
-        for i in range(len(enemies)):
-            enemy_buttons.append(Button(enemy_x[i], enemy_y[i] - 100, 150, 50, (255, 0, 0, 100), f'Damage enemy {i}',
-                                        lambda j=i: enemies[j].update_health(-10)))
-        self.enemy_buttons = enemy_buttons
-
         self.delay = 0
         self.choosing_ability = False
-        self.end_turn_button = Button(475, 650, 50, 50, (255, 0, 0, 100), 'End Turn', lambda: setattr(self, 'choosing_ability', False))
+        self.end_turn_button = Button(475, 650, 50, 50, (255, 0, 0, 100), 'End Turn', lambda: self.end_turn())
+
+        self.selected_enemy = None
+        self.selected_ally = None
+        self.selected_ability = None
+
+        self.ability_sprites = pygame.sprite.Group()
+
+    def end_turn(self):
+        self.choosing_ability = False
+        self.selected_enemy = None
+        self.selected_ally = None
+        self.selected_ability = None
+        self.ability_sprites.empty()
+
+    def inventory_event_handler(self, event, surface):
+        if event.type == pygame.MOUSEBUTTONDOWN:
+            mouse_pos = pygame.mouse.get_pos()
+            if self.choosing_ability:
+                for sprite in self.ability_sprites:
+                    if sprite.rect.collidepoint(mouse_pos):
+                        self.use_ability(sprite.ability)
+                        return
+
+                for enemy in self.enemies:
+                    if enemy.rect.collidepoint(mouse_pos):
+                        self.selected_enemy = enemy
+                        self.selected_ally = None
+                        self.display_abilities(surface)
+                        return
+
+                for ally in self.allies:
+                    if ally.rect.collidepoint(mouse_pos):
+                        self.selected_ally = ally
+                        self.selected_enemy = None
+                        self.display_abilities(surface)
+                        return
+
+    def display_abilities(self, surface):
+        # display the abilities of the first ally
+        abilities = self.allies[0].unit.abilities
+        self.ability_sprites.empty()
+
+        usable_abilities = []
+        for ability in abilities:
+            if self.selected_enemy is not None and ability.target == "enemy":
+                usable_abilities.append(ability)
+            elif self.selected_ally is not None and ability.target == "ally":
+                usable_abilities.append(ability)
+
+        radius = 100
+        for i, ability in enumerate(usable_abilities):
+            angle = 2 * math.pi * i / len(usable_abilities)
+            x = y = 0
+            if self.selected_enemy is not None and ability.target == "enemy":
+                x = self.selected_enemy.rect.x + self.selected_enemy.rect.width / 2 + math.sin(angle) * radius
+                y = self.selected_enemy.rect.y + self.selected_enemy.rect.height / 2 + math.cos(angle) * radius
+            elif self.selected_ally is not None and ability.target == "ally":
+                x = self.selected_ally.rect.x + self.selected_ally.rect.width / 2 + math.sin(angle) * radius
+                y = self.selected_ally.rect.y + self.selected_ally.rect.height / 2 + math.cos(angle) * radius
+            sprite = AbilitySprite(x, y, 50, 50, (255, 0, 0, 100), ability, ability.sprite_path)
+            self.ability_sprites.add(sprite)
+
+    def use_ability(self, ability):
+        self.selected_ability = ability
+        if self.selected_enemy is not None:
+            damage_value = self.selected_ability.use(self.allies[0].unit, self.selected_enemy.unit)
+            print("used ability on enemy, damage:", damage_value)
+            self.selected_enemy.update_health(-damage_value)
+            if self.selected_enemy.health_bar.target_value <= 0:
+                self.enemies.remove(self.selected_enemy)
+        elif self.selected_ally is not None:
+            heal_value = self.selected_ability.use(self.allies[0].unit, self.selected_ally.unit)
+            print("used ability on ally, heal:", heal_value)
+            self.selected_ally.update_health(heal_value)
+
+        self.choosing_ability = False
+        self.selected_enemy = None
+        self.selected_ally = None
+        self.selected_ability = None
+        self.ability_sprites.empty()
+
+        self.delay = 90
 
     def ally_action(self, ally):
 
@@ -182,20 +267,13 @@ class Stage:
                 # wait for the player (first friendly unit) to choose an ability
                 if i == 1:
                     self.choosing_ability = True
-                    # temporary ability
-                    damage_value = ally.unit.abilities[0].use(ally.unit, self.enemies[0].unit)
-                    print("ally " + str(i) + " damage " + str(damage_value))
-                    self.enemies[0].update_health(-damage_value)
-                    if self.enemies[0].health_bar.target_value <= 0:
-                        self.enemies.remove(self.enemies[0])
-                    self.delay = 60
                     return
 
                 # ally ai
                 self.ally_action(ally)
 
                 ally.speed_bar.update_value(-ally.speed_bar.max_value)
-                self.delay = 60
+                self.delay = 90
                 return
 
             # if ally is dead, remove it
@@ -216,7 +294,7 @@ class Stage:
                 self.enemy_action(enemy)
 
                 enemy.speed_bar.update_value(-enemy.speed_bar.max_value)
-                self.delay = 60
+                self.delay = 90
                 return
 
             # if enemy is dead, remove it
@@ -233,9 +311,22 @@ class Stage:
 
         self.end_turn_button.draw(surface)
 
-        # Temporary buttons for testing
-        for button in self.enemy_buttons:
-            button.draw(surface)
+        if self.choosing_ability and hasattr(self, 'ability_sprites'):
+            self.ability_sprites.draw(surface)
+
+        # Check if the mouse is hovering over any ability button
+        mouse_pos = pygame.mouse.get_pos()
+        if self.choosing_ability and hasattr(self, 'ability_sprites'):
+            for sprite in self.ability_sprites:
+                if sprite.rect.collidepoint(mouse_pos):
+                    # Draw the name and description of the ability
+                    font = pygame.font.Font(None, 36)
+                    ability = sprite.ability
+                    text_surface = font.render(ability.name, True, (255, 255, 255))
+                    surface.blit(text_surface, (mouse_pos[0], mouse_pos[1] - 20))
+                    description_surface = font.render(ability.description, True, (255, 255, 255))
+                    surface.blit(description_surface, (mouse_pos[0], mouse_pos[1] + 20))
+                    break
 
     def all_enemies_dead(self):
         return all(not enemy.alive for enemy in self.enemies)

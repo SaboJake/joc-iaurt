@@ -1,12 +1,13 @@
 
 class Ability:
-    def __init__(self, name, description, cooldown, cost, target):
+    def __init__(self, name, description, cooldown, cost, target, sprite_path):
         self.name = name
         self.description = description
         self.cooldown = cooldown
         self.cost = cost
         # self, ally, enemy or all
         self.target = target
+        self.sprite_path = sprite_path
 
     def use(self, user, target):
         if user.stats.focus < self.cost:

@@ -3,8 +3,8 @@ import random
 from abilities.ability import Ability
 
 class BasicAttack(Ability):
-    def __init__(self, coeffs, name, description, cooldown, cost, element):
-        super().__init__(name, description, cooldown, cost, 'enemy')
+    def __init__(self, coeffs, name, description, cooldown, cost, element, sprite_path):
+        super().__init__(name, description, cooldown, cost, 'enemy', sprite_path)
         self.coeffs = {
             'strength': coeffs['strength'],
             'intelligence': coeffs['intelligence'],

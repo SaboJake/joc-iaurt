@@ -49,9 +49,10 @@ stage_active = False
 def start_stage():
     global stage
     names_array = ["Amogus", "Amogus", "Amogus"]
+    clas_array = ["am", "og", "us"]
     sprite_paths_array = [sprite_paths, sprite_paths, sprite_paths]
     death_sprite_paths_array = [death_sprite_paths, death_sprite_paths, death_sprite_paths]
-    stage = Stage(names_array, sprite_paths_array, death_sprite_paths_array)
+    stage = Stage(names_array, clas_array, sprite_paths_array, death_sprite_paths_array)
     global stage_active
     stage_active = True
 
@@ -79,6 +80,8 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+        if stage_active:
+            stage.inventory_event_handler(event, screen)
 
     # Update the game
     keys = pygame.key.get_pressed()
