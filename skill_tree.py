@@ -17,11 +17,14 @@ class SkillTree:
         self.cols = 4
 
         self.grid = []
-        abilities_row = []
         for i in range(5):
+            abilities_row = []
             for j in range(4):
-                ability = BasicAttack(coeffs, "attack", "WHO CARES", 0, 0, "physical", 'sprites/abilities/slash.png')
-                abilities_row.append(AbilitySprite(0, 0, 50, 50, (255, 0, 0, 100), ability, 'sprites/abilities/slash.png'))
+                if (i == 0 and j == 0) or (i == 0 and j == 2) or (i == 1 and j == 0):
+                    ability = BasicAttack(coeffs, "attack", "WHO CARES", 0, 0, "physical", 'sprites/abilities/slash.png')
+                    abilities_row.append(AbilitySprite(0, 0, 50, 50, (255, 0, 0, 100), ability, 'sprites/abilities/slash.png'))
+                else:
+                    abilities_row.append(None)
             self.grid.append(abilities_row)
 
         self.selected_ability = None
@@ -33,9 +36,10 @@ class SkillTree:
                 y = row * 60 + 100
                 pygame.draw.rect(surface, (255, 255, 255), (x, y, 50, 50), 2)
 
-                if not self.grid[row][col].bought:
-                    self.grid[row][col].gray_out(surface)
-                surface.blit(self.grid[row][col].image, (x, y))
+                if not self.grid[row][col] is None:
+                    # if not self.grid[row][col].bought:
+                    #     self.grid[row][col].gray_out(surface, x, y)
+                    surface.blit(self.grid[row][col].image, (x, y))
 
     def handle_event(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN:
