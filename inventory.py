@@ -155,7 +155,7 @@ def draw_item_info(surface, item, pos):
         text_surface = font.render(line, True, (255, 255, 255))
         surface.blit(text_surface, (x + padding, y + padding + i * font.get_height()))
 
-def draw_error_message(surface, message, pos):
+def draw_message(surface, message, colour, pos):
     """Draw an error message window."""
     font = pygame.font.Font(None, 24)
     x, y = pos
@@ -165,7 +165,7 @@ def draw_error_message(surface, message, pos):
 
     # Draw background
     pygame.draw.rect(surface, (0, 0, 0), (x, y, width, height))
-    pygame.draw.rect(surface, (255, 0, 0), (x, y, width, height), 1)
+    pygame.draw.rect(surface, colour, (x, y, width, height), 1)
 
     # Draw text
     text_surface = font.render(message, True, (255, 255, 255))
@@ -357,7 +357,7 @@ def draw_delete_logic():
     global delete_message
     if delete_message:
         mouse_x, mouse_y = pygame.mouse.get_pos()
-        draw_error_message(screen, delete_message, (mouse_x - 30, mouse_y))
+        draw_message(screen, delete_message, (255, 0, 0), (mouse_x - 30, mouse_y))
 
 def inventory_logic():
     global running, current_unit, selected_item, selected_item_pos, error_message, error_message_pos, error_message_timer
@@ -396,7 +396,7 @@ def inventory_logic():
 
     # Draw error message if exists
     if error_message and pygame.time.get_ticks() - error_message_timer < 1000:  # Display for 1 second
-        draw_error_message(screen, error_message, error_message_pos)
+        draw_message(screen, error_message, (255, 0, 0), error_message_pos)
     else:
         error_message = None
     # Draw delete message if hovering over the delete button

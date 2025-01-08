@@ -1,5 +1,5 @@
 import pygame
-import switch
+
 from pygame.examples.midi import NullKey
 
 from utils.button import Button

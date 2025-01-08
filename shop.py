@@ -8,7 +8,8 @@ from utils.button import Button
 from inventory import draw_inventory, draw_money, delete_button, inventory_event_handler, inventory_logic, SLOT_SIZE, \
     OFFSET_X, OFFSET_Y, GRID_ROWS, GRID_COLS, BG_COLOR, money, inventory, selected_item, draw_equipment_background, \
     draw_item_info_logic, draw_item_following_mouse, draw_delete_logic, draw_equipment, unit_equipment, current_unit, \
-    set_equipment_slots, draw_item_info, delete_button_pos, DELETE_BUTTON_WIDTH, DELETE_BUTTON_HEIGHT
+    set_equipment_slots, draw_item_info, delete_button_pos, DELETE_BUTTON_WIDTH, DELETE_BUTTON_HEIGHT, draw_message, \
+    get_selected_item, set_selected_item
 
 for_sale = []
 
@@ -74,22 +75,35 @@ def draw_item_info_with_cost(surface, item, pos):
         text_surface = font.render(line, True, color)
         surface.blit(text_surface, (x + padding, y + padding + i * font.get_height()))
 
+sell_message = None
+
 def sell_selected_item():
-    global money
+    global money, sell_message
     if get_selected_item():
         sell_price = get_selected_item().item.price // 2  # Example: sell for half the price
         money += sell_price
         print(f"Sold {get_selected_item().item.name} for {sell_price} RON")
         set_selected_item(None)
+        sell_message = None
+
+def display_sell_message():
+    global sell_message
+    if get_selected_item():
+        sell_message = "Sell for " + str(get_selected_item().item.sell_price) + " RON"
+
+def clear_sell_message():
+    global sell_message
+    sell_message = None
 
 sell_button = Button(
-    delete_button_pos[0] + DELETE_BUTTON_WIDTH + 10, delete_button_pos[1], DELETE_BUTTON_WIDTH, DELETE_BUTTON_HEIGHT,
-    (255, 255, 0), 'Sell', lambda: sell_selected_item()
+    delete_button_pos[0] - DELETE_BUTTON_WIDTH - 10, delete_button_pos[1], DELETE_BUTTON_WIDTH, DELETE_BUTTON_HEIGHT,
+    (255, 255, 0), 'Sell', lambda: sell_selected_item(), display_sell_message, clear_sell_message
 )
 
 from inventory import get_selected_item, set_selected_item
 
 def shop_logic():
+    global sell_message
     screen.fill(BG_COLOR)
     draw_inventory(screen, inventory, get_selected_item())
     draw_money(screen, money, (OFFSET_X, OFFSET_Y + GRID_ROWS * SLOT_SIZE + 10))
@@ -109,6 +123,10 @@ def shop_logic():
     draw_item_info_logic()
     draw_item_following_mouse()
     draw_delete_logic()
+
+    if sell_message:
+        draw_message(screen, sell_message, (255, 255, 0), pygame.mouse.get_pos())
+
 
 def shop_event_handler(event):
     global money
