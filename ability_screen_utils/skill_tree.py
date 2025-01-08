@@ -36,7 +36,7 @@ class SkillTree:
         self.grid[0][1] = AbilitySprite(GRID_OFFSET_X + 0 * GRID_SPACING + SLOT_SIZE / 2, GRID_OFFSET_Y + 1 * GRID_SPACING + SLOT_SIZE / 2, SLOT_SIZE, SLOT_SIZE, ability)
         self.grid[1][0] = AbilitySprite(GRID_OFFSET_X + 1 * GRID_SPACING + SLOT_SIZE / 2, GRID_OFFSET_Y + 0 * GRID_SPACING + SLOT_SIZE / 2, SLOT_SIZE, SLOT_SIZE, ability)
 
-        self.abiility_pool = ability_pool
+        self.ability_pool = ability_pool
 
     def draw(self, surface):
         for row in range(self.rows):

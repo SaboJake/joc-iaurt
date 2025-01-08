@@ -55,12 +55,12 @@ def ability_screen_event_handler(event):
 running = True
 selected_ability = None
 ability_wheel = AbilityWheel((1000, 175), WHEEL_RADIUS, 8, SLOT_SIZE)
-abilities = [AbilitySprite(0, 0, SLOT_SIZE, SLOT_SIZE, Ability(f"Ability {i+1}", "Description", 0, 0, "self", 'sprites/abilities/slash.png')) for i in range(5)]
+abilities = [AbilitySprite(0, 0, SLOT_SIZE, SLOT_SIZE, Ability(f"Ability {i+1}", "Description", 0, 0, "self", 'sprites/abilities/slash.png')) for i in range(2)]
 ability_pool = AbilityPool((POOL_OFFSET_X, POOL_OFFSET_Y), abilities, SLOT_SIZE)
 
 from globals import player_unit
 
-skill_tree = SkillTree(player_unit)
+skill_tree = SkillTree(player_unit, ability_pool)
 
 def main():
     while running:
