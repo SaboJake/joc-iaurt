@@ -33,8 +33,8 @@ class SkillTree:
         # add abilities to the grid
         ability = BasicAttack(coeffs, "attack", "WHO CARES", 0, 0, "physical", 'sprites/abilities/slash.png')
         self.grid[0][0] = AbilitySprite(GRID_OFFSET_X + 0 * GRID_SPACING + SLOT_SIZE / 2, GRID_OFFSET_Y + 0 * GRID_SPACING + SLOT_SIZE / 2, SLOT_SIZE, SLOT_SIZE, ability)
-        self.grid[0][1] = AbilitySprite(GRID_OFFSET_X + 0 * GRID_SPACING + SLOT_SIZE / 2, GRID_OFFSET_Y + 1 * GRID_SPACING + SLOT_SIZE / 2, SLOT_SIZE, SLOT_SIZE, ability)
-        self.grid[1][0] = AbilitySprite(GRID_OFFSET_X + 1 * GRID_SPACING + SLOT_SIZE / 2, GRID_OFFSET_Y + 0 * GRID_SPACING + SLOT_SIZE / 2, SLOT_SIZE, SLOT_SIZE, ability)
+        self.grid[0][1] = AbilitySprite(GRID_OFFSET_X + 1 * GRID_SPACING + SLOT_SIZE / 2, GRID_OFFSET_Y + 0 * GRID_SPACING + SLOT_SIZE / 2, SLOT_SIZE, SLOT_SIZE, ability)
+        self.grid[1][0] = AbilitySprite(GRID_OFFSET_X + 0 * GRID_SPACING + SLOT_SIZE / 2, GRID_OFFSET_Y + 1 * GRID_SPACING + SLOT_SIZE / 2, SLOT_SIZE, SLOT_SIZE, ability)
 
         self.ability_pool = ability_pool
 
@@ -50,7 +50,7 @@ class SkillTree:
                     if not self.grid[row][col].bought:
                         self.grid[row][col].gray_out(surface, x, y)
 
-                    self.grid[row][col].show_info(surface)
+                    # self.grid[row][col].show_info(surface)
 
         self.draw_player_info(surface)
 
@@ -88,7 +88,9 @@ class SkillTree:
             self.player_unit.skill_points -= 1
             self.player_unit.abilities.append(ability_sprite.ability)
             print(f"Bought ability: {ability_sprite.ability.name}")
-            self.ability_pool.abilities.append(ability_sprite)
+            new_x, new_y = self.ability_pool.get_next_item_center()
+            new = AbilitySprite(new_x, new_y, SLOT_SIZE, SLOT_SIZE, ability_sprite.ability)
+            self.ability_pool.abilities.append(new)
         else:
             print("Not enough skill points or ability already bought")
 
