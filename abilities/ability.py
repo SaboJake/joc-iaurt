@@ -8,6 +8,8 @@ class Ability:
         # self, ally, enemy or all
         self.target = target
         self.sprite_path = sprite_path
+        self.level = 0
+        self.max_level = 3
 
     def use(self, user, target):
         if user.stats.focus < self.cost:

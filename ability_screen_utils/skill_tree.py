@@ -4,7 +4,7 @@ from abilities.basic_attack import BasicAttack
 from abilities.ability_sprite import AbilitySprite
 
 # Define constants
-SLOT_SIZE = 30
+SLOT_SIZE = 40
 GRID_OFFSET_X = 100
 GRID_OFFSET_Y = 100
 GRID_SPACING = 75
@@ -60,3 +60,4 @@ class SkillTree:
             print(f"Bought ability: {ability_sprite.ability.name}")
         else:
             print("Not enough skill points or ability already bought")
+
