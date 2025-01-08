@@ -1,4 +1,8 @@
+import textwrap
+
 import pygame
+
+MAX_BOX_WIDTH = 200
 
 class AbilitySprite(pygame.sprite.Sprite):
     def __init__(self, x, y, width, height, ability):
@@ -33,13 +37,18 @@ class AbilitySprite(pygame.sprite.Sprite):
 
         if self.rect.collidepoint(mouse_pos):
             ability = self.ability
-            ability_info = f"Name: {ability.name}\nLevel: {ability.level}\n{ability.get_upgrade_description()}"
+            ability_info = f"Name: {ability.name}\nLevel: {ability.level} / {ability.max_level}\n{ability.description}"
             lines = ability_info.split('\n')
+
+            # Wrap lines to fit within MAX_BOX_WIDTH
+            wrapped_lines = []
+            for line in lines:
+                wrapped_lines.extend(textwrap.wrap(line, width=MAX_BOX_WIDTH // font.size('A')[0]))
 
             # Calculate the size of the text box
             padding = 5
-            max_width = max(font.size(line)[0] for line in lines) + 2 * padding
-            total_height = (len(lines) - 1) * font.get_height() + 2 * padding
+            max_width = min(MAX_BOX_WIDTH, max(font.size(line)[0] for line in wrapped_lines) + 2 * padding)
+            total_height = len(wrapped_lines) * font.get_height() + 2 * padding
 
             # Draw black box
             box_x = mouse_pos[0] + 10
@@ -48,8 +57,41 @@ class AbilitySprite(pygame.sprite.Sprite):
             pygame.draw.rect(surface, (255, 255, 255), (box_x, box_y, max_width, total_height), 2)
 
             # Draw the text
-            for i, line in enumerate(lines):
+            text_x = box_x + padding
+            for i, line in enumerate(wrapped_lines):
                 text_surface = font.render(line, True, (255, 255, 255))
-                text_x = box_x + padding
                 text_y = box_y + padding + i * font.get_height()
                 surface.blit(text_surface, (text_x, text_y))
+
+            if text_x > 500:
+                return
+
+            # If the ability is bought, show the upgrade info
+            if self.bought:
+                upgrade_info = ability.get_upgrade_description()
+                upgrade_lines = upgrade_info.split('\n')
+
+                # Wrap lines to fit within MAX_BOX_WIDTH
+                wrapped_upgrade_lines = []
+                for line in upgrade_lines:
+                    wrapped_upgrade_lines.extend(textwrap.wrap(line, width=MAX_BOX_WIDTH // font.size('A')[0]))
+
+                # Calculate the size of the upgrade text box
+                upgrade_max_width = min(MAX_BOX_WIDTH,
+                                        max(font.size(line)[0] for line in wrapped_upgrade_lines) + 2 * padding)
+                upgrade_total_height = len(wrapped_upgrade_lines) * font.get_height() + 2 * padding
+
+                # Draw black box for upgrade info
+                upgrade_box_x = box_x + max_width - 2
+                upgrade_box_y = box_y
+                pygame.draw.rect(surface, (0, 0, 0),
+                                 (upgrade_box_x, upgrade_box_y, upgrade_max_width, upgrade_total_height))
+                pygame.draw.rect(surface, (255, 255, 255),
+                                 (upgrade_box_x, upgrade_box_y, upgrade_max_width, upgrade_total_height), 2)
+
+                # Draw the upgrade text
+                for i, line in enumerate(wrapped_upgrade_lines):
+                    text_surface = font.render(line, True, (255, 255, 255))
+                    text_x = upgrade_box_x + padding
+                    text_y = upgrade_box_y + padding + i * font.get_height()
+                    surface.blit(text_surface, (text_x, text_y))
