@@ -31,3 +31,9 @@ class Ability:
 
     def get_upgrade_description(self):
         return ''
+
+    def ability_upgrade(self):
+        if self.level < self.max_level:
+            self.level += 1
+            return True
+        return False

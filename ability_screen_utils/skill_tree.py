@@ -82,8 +82,12 @@ class SkillTree:
                 if self.selected_ability:
                     self.buy_ability(self.selected_ability)
 
-    def buy_ability(self, ability_sprite):
-        if not ability_sprite.bought and self.player_unit.skill_points >= 1:
+    def buy_ability(self, ability_sprite: AbilitySprite):
+        if self.player_unit.skill_points < 1:
+            print("Not enough skill points")
+            return
+
+        if not ability_sprite.bought:
             ability_sprite.bought = True
             self.player_unit.skill_points -= 1
             self.player_unit.abilities.append(ability_sprite.ability)
@@ -91,6 +95,11 @@ class SkillTree:
             new_x, new_y = self.ability_pool.get_next_item_center()
             new = AbilitySprite(new_x, new_y, SLOT_SIZE, SLOT_SIZE, ability_sprite.ability)
             self.ability_pool.abilities.append(new)
+            ability_sprite.ability.level += 1
         else:
-            print("Not enough skill points or ability already bought")
+            if not ability_sprite.ability.ability_upgrade():
+                print("Max level reached")
+                return
+            self.player_unit.skill_points -= 1
+            print(f"Upgraded ability: {ability_sprite.ability.name}")
 

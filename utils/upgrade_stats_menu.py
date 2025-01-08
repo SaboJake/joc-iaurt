@@ -22,7 +22,7 @@ upgrade_buttons = {
 
 def draw_stats_box(surface):
     font = pygame.font.Font(None, 40)
-    stats = player_unit.stats
+    stats = player_unit.base_stats
     stats_info = [
         f"Vitality: {stats.vitality}",
         f"Strength: {stats.strength}",

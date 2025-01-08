@@ -36,3 +36,11 @@ class BasicHeal(Ability):
 
     def get_upgrade_description(self):
         return f"intelligence: {self.coeffs['intelligence']} -> {self.coeffs['intelligence'] * 1.5}\nspeed: {self.coeffs['speed']} -> {self.coeffs['speed'] * 1.5}\n"
+
+    def ability_upgrade(self):
+        if self.level < self.max_level:
+            self.coeffs['intelligence'] *= 1.5
+            self.coeffs['speed'] *= 1.5
+            self.level += 1
+            return True
+        return False

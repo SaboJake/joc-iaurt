@@ -63,11 +63,11 @@ class AbilitySprite(pygame.sprite.Sprite):
                 text_y = box_y + padding + i * font.get_height()
                 surface.blit(text_surface, (text_x, text_y))
 
-            if text_x > 500:
-                return
+            # if text_x > 500:
+            #     return
 
             # If the ability is bought, show the upgrade info
-            if self.bought:
+            if self.bought and ability.level < ability.max_level:
                 upgrade_info = ability.get_upgrade_description()
                 upgrade_lines = upgrade_info.split('\n')
 
