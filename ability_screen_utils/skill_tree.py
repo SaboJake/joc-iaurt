@@ -12,8 +12,8 @@ GRID_SPACING = 75
 
 PLAYER_INFO_X = 400
 PLAYER_INFO_Y = 100
-PLAYER_INFO_BOX_WIDTH = 200
-PLAYER_INFO_BOX_HEIGHT = 600
+PLAYER_INFO_BOX_WIDTH = 350
+PLAYER_INFO_BOX_HEIGHT = 400
 
 coeffs = {
     'strength': 1,
@@ -56,7 +56,7 @@ class SkillTree:
 
     def draw_player_info(self, surface):
         font = pygame.font.Font(None, 36)
-        player_info = f"{self.player_unit.name}\nLevel {self.player_unit.level}"
+        player_info = f"{self.player_unit.name}\nLevel {self.player_unit.level}\nSkill Points: {self.player_unit.skill_points}\nStat points: {self.player_unit.stat_points}"
         lines = player_info.split('\n')
 
         # Draw the black box with a white outline

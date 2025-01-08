@@ -6,6 +6,9 @@ from abilities.ability_sprite import AbilitySprite
 from ability_screen_utils.ability_wheel import AbilityWheel
 from ability_screen_utils.ability_pool import AbilityPool
 from ability_screen_utils.skill_tree import SkillTree
+from utils.upgrade_stats_menu import draw_stats_box
+
+from globals import player_unit
 
 # Constants
 SCREEN_WIDTH, SCREEN_HEIGHT = 1200, 900
@@ -26,6 +29,7 @@ def ability_screen_logic():
     skill_tree.draw(screen)
     ability_wheel.draw(screen)
     ability_pool.draw(screen)
+    draw_stats_box(screen)
     if selected_ability:
         mouse_x, mouse_y = pygame.mouse.get_pos()
         screen.blit(selected_ability.image, (mouse_x - SLOT_SIZE // 2, mouse_y - SLOT_SIZE // 2))
@@ -86,8 +90,6 @@ abilities =[slash_sprite1, slash_sprite2]
 
 # Add the slashes to the abilities list
 ability_pool = AbilityPool((POOL_OFFSET_X, POOL_OFFSET_Y), abilities, SLOT_SIZE)
-
-from globals import player_unit
 
 skill_tree = SkillTree(player_unit, ability_pool)
 

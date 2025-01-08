@@ -37,7 +37,7 @@ class AbilitySprite(pygame.sprite.Sprite):
 
         if self.rect.collidepoint(mouse_pos):
             ability = self.ability
-            ability_info = f"Name: {ability.name}\nLevel: {ability.level} / {ability.max_level}\n{ability.description}"
+            ability_info = f"Name: {ability.name}\nLevel: {ability.level} / {ability.max_level}\n{ability.description}\n{self.get_ability_stats()}"
             lines = ability_info.split('\n')
 
             # Wrap lines to fit within MAX_BOX_WIDTH
@@ -95,3 +95,8 @@ class AbilitySprite(pygame.sprite.Sprite):
                     text_x = upgrade_box_x + padding
                     text_y = upgrade_box_y + padding + i * font.get_height()
                     surface.blit(text_surface, (text_x, text_y))
+
+    def get_ability_stats(self):
+        if hasattr(self.ability, 'coeffs'):
+            return f"Strength: {self.ability.coeffs['strength']}\nIntelligence: {self.ability.coeffs['intelligence']}\nSpeed: {self.ability.coeffs['speed']}"
+        return ""
