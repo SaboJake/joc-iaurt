@@ -281,6 +281,13 @@ def regular_slot_logic(slot):
             selected_item = tmp
             print("Swapped items:", slot)
 
+def display_error_message():
+    global error_message
+    if error_message and pygame.time.get_ticks() - error_message_timer < 1000:  # Display for 1 second
+        draw_message(screen, error_message, (255, 0, 0), error_message_pos)
+    else:
+        error_message = None
+
 def inventory_event_handler(event):
     global running, current_unit, selected_item, selected_item_pos, error_message, error_message_pos, error_message_timer
     if event.type == pygame.QUIT:
@@ -395,10 +402,7 @@ def inventory_logic():
     draw_item_following_mouse()
 
     # Draw error message if exists
-    if error_message and pygame.time.get_ticks() - error_message_timer < 1000:  # Display for 1 second
-        draw_message(screen, error_message, (255, 0, 0), error_message_pos)
-    else:
-        error_message = None
+    display_error_message()
     # Draw delete message if hovering over the delete button
     draw_delete_logic()
 

@@ -9,7 +9,7 @@ from inventory import draw_inventory, draw_money, delete_button, inventory_event
     OFFSET_X, OFFSET_Y, GRID_ROWS, GRID_COLS, BG_COLOR, money, inventory, selected_item, draw_equipment_background, \
     draw_item_info_logic, draw_item_following_mouse, draw_delete_logic, draw_equipment, unit_equipment, current_unit, \
     set_equipment_slots, draw_item_info, delete_button_pos, DELETE_BUTTON_WIDTH, DELETE_BUTTON_HEIGHT, draw_message, \
-    get_selected_item, set_selected_item
+    get_selected_item, set_selected_item, display_error_message
 
 for_sale = []
 
@@ -127,6 +127,9 @@ def shop_logic():
     if sell_message:
         draw_message(screen, sell_message, (255, 255, 0), pygame.mouse.get_pos())
 
+    display_error_message()
+    shop_item_info_logic()
+
 
 def shop_event_handler(event):
     global money
@@ -167,7 +170,6 @@ if __name__ == "__main__":
                 running = False
             shop_event_handler(event)
         shop_logic()
-        shop_item_info_logic()
         pygame.display.flip()
         clock.tick(FPS)
     pygame.quit()
