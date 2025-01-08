@@ -35,14 +35,14 @@ coeffs = {
 }
 
 class Stage:
-    def __init__(self, names_array, clas_array, sprite_paths_array, death_sprite_paths_array, stage_no):
+    def __init__(self, names_array, clas_array, sprite_paths_array, death_sprite_paths_array, stage_no, player_unit):
         # add allies
         allies = []
         ally_units = []
         for i in range(len(names_array)):
             # first unit is the player
             if i == 0:
-                ally_units.append(PlayerUnit(names_array[i], clas_array[i], Stats(10, 10, 10, 25 + (3 - i) * 5, 10), Stats(10, 10, 10, 25 + (3 - i) * 5, 10)))
+                ally_units.append(player_unit)
             else:
                 ally_units.append(FriendlyUnit(names_array[i], clas_array[i], Stats(10, 10, 10, 25 + (3 - i) * 5, 10), Stats(10, 10, 10, 25 + (3 - i) * 5, 10)))
             ally_units[i].abilities.append(BasicAttack(coeffs, "attack", "WHO CARES", 0, 0, "physical", 'sprites/abilities/slash.png'))

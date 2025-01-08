@@ -7,3 +7,9 @@ class AbilitySprite(pygame.sprite.Sprite):
         self.image = pygame.transform.scale(self.image, (width, height))
         self.rect = self.image.get_rect(center=(x, y))
         self.ability = ability
+        self.bought = False
+
+    def gray_out(self, surface):
+        gray_image = pygame.Surface(self.image.get_size(), pygame.SRCALPHA)
+        gray_image.fill((100, 100, 100, 150))  # Adjust the alpha value to make it more transparent
+        surface.blit(gray_image, self.rect)

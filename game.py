@@ -2,10 +2,13 @@ import pygame
 
 from pygame.examples.midi import NullKey
 
+from units.player_unit import PlayerUnit
 from utils.button import Button
 from utils.health_bar import HealthBar
 from utils.enemy import Enemy
 from utils.stage import Stage
+from skill_tree import SkillTree
+from utils.stats import Stats
 
 # Initialize the game
 pygame.init()
@@ -43,6 +46,9 @@ enemy_damage_button = Button(310, 200, 200, 50, (255, 0, 0, 100), 'Damage Enemy'
 enemy_decrease_speed_button = Button(310, 250, 200, 50, (255, 0, 0, 100), 'Decrease Speed', lambda: enemy.speed_bar.update_value(-10))
 speed_coef = 1 / 5
 
+# create player unit
+player_unit = PlayerUnit("Darius", "Warrior", Stats(10, 10, 10, 35, 10, 10, 10, 10), Stats(10, 10, 10, 35, 10, 10, 10, 10))
+
 # Create stage
 stage = None
 stage_no = 0
@@ -60,8 +66,15 @@ def start_stage():
     game_state = "stage"
 
 start_stage_button = Button(100, 200, 200, 100, (255, 0, 0, 100), 'Start Stage', lambda: start_stage())
-
 next_stage_button = Button(200, 200, 200, 100, (255, 0, 0, 100), 'Next Stage', lambda: start_stage())
+
+skill_tree = SkillTree(player_unit)
+
+def open_skill_tree():
+    global game_state
+    game_state = "skill_tree"
+
+skill_tree_button = Button(400, 400, 200, 100, (255, 0, 0, 100), 'Skill Tree', lambda: open_skill_tree())
 
 # Load the background image
 background_image = pygame.image.load('sprites/backgrounds/stage_background.png')
@@ -91,6 +104,8 @@ while running:
             running = False
         if game_state == "stage":
             stage.inventory_event_handler(event, screen)
+        elif game_state == "skill_tree":
+            skill_tree.handle_event(event)
 
     # Update the game
     keys = pygame.key.get_pressed()
@@ -116,6 +131,7 @@ while running:
         # Draw the game
         screen.blit(surface, (0, 0))
         draw_game()
+        skill_tree_button.draw(screen)
 
     elif game_state == "stage":
         # Update the stage
@@ -134,6 +150,9 @@ while running:
         # Draw the game menu
         screen.blit(game_menu_background, (0, 0))
         draw_game_menu()
+
+    elif game_state == "skill_tree":
+        skill_tree.draw(screen)
 
     pygame.display.flip()
 
