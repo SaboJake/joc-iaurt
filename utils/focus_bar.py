@@ -1,9 +1,9 @@
 import pygame
 from utils.bar import Bar
 
-class HealthBar(Bar):
+class FocusBar(Bar):
     def __init__(self, x, y, width, height, max_health, name):
-        super().__init__(x, y, width, height, max_health, (255, 0, 0), (0, 255, 0))
+        super().__init__(x, y, width, height, max_health, (100, 100, 100), (0, 0, 255))
         self.name = name
 
     def draw(self, surface):

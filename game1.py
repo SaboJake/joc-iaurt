@@ -1,6 +1,7 @@
 import pygame
 
 from shop import shop_logic, shop_event_handler
+from utils.stage import Stage
 
 pygame.init()
 
@@ -8,6 +9,9 @@ from utils.status_bar import StatusBar
 from utils.button import Button  # Import the Button class from utils
 from inventory import inventory_logic, inventory_event_handler, set_equipment_slots
 from ability_screen import ability_screen_logic, ability_screen_event_handler
+
+background_image = pygame.image.load('sprites/backgrounds/stage_background.png')
+game_menu_background = pygame.image.load('sprites/backgrounds/game_menu_background.png')
 
 inventory_equipment_slots = {
     "helmet": (100, 200),
@@ -40,6 +44,14 @@ def shop_screen():
     status_bar.current_screen = "shop"
     set_equipment_slots(shop_equipment_slots)
 
+stage = None
+stage_no = 0
+
+def stage_screen():
+    global stage, stage_no
+    status_bar.current_screen = "stage"
+    stage = Stage(stage_no)
+
 # Initialize buttons
 inventory_button = Button(10, 10, 150, 50, (0, 0, 255), 'Inventory', inventory_screen)
 ability_button = Button(170, 10, 150, 50, (0, 0, 255), 'Abilities', ability_screen)
@@ -47,6 +59,8 @@ ability_button = Button(170, 10, 150, 50, (0, 0, 255), 'Abilities', ability_scre
 exit_button = Button(1200 - 150 - 10, 10, 150, 50, (255, 0, 0), 'Exit', lambda: exit_menu())
 # Shop button
 shop_button = Button(330, 200, 150, 50, (0, 0, 255), 'Shop', shop_screen)
+# Next stage button
+next_stage_button = Button(660, 200, 150, 50, (0, 0, 255), 'Next Stage', lambda: stage_screen())
 
 def exit_menu():
     status_bar.current_screen = ""
@@ -71,20 +85,38 @@ if __name__ == "__main__":
                 shop_event_handler(event)
             elif status_bar.current_screen == "ability":
                 ability_screen_event_handler(event)
+            elif status_bar.current_screen == "stage":
+                stage.inventory_event_handler(event, screen)
         screen.fill(BG_COLOR)
 
         if status_bar.current_screen == "":
+            screen.blit(game_menu_background, (0, 0))
             shop_button.draw(screen)
+            next_stage_button.draw(screen)
+            status_bar.draw()
         elif status_bar.current_screen == "inventory":
             inventory_logic()
             exit_button.draw(screen)
+            status_bar.draw()
         elif status_bar.current_screen == "shop":
             shop_logic()
             exit_button.draw(screen)
+            status_bar.draw()
         elif status_bar.current_screen == "ability":
             ability_screen_logic()
             exit_button.draw(screen)
-        status_bar.draw()
+            status_bar.draw()
+        elif status_bar.current_screen == "stage":
+            stage.update()
+            if stage.all_enemies_dead():
+                stage_no += 1
+                status_bar.current_screen = ""
+            if stage.player_dead():
+                status_bar.current_screen = ""
+
+            screen.blit(background_image, (0, 0))
+            stage.draw(screen)
+
         pygame.display.flip()
         clock.tick(FPS)
 

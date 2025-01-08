@@ -8,25 +8,27 @@ from abilities.basic_attack import BasicAttack
 from abilities.basic_heal import BasicHeal
 from units.player_unit import PlayerUnit
 from utils.button import Button
-from utils.enemy import Enemy
+from utils.display_unit import DisplayUnit
 from units.unit import Unit
 from units.friendly_unit import FriendlyUnit
 from utils.stats import Stats
 from abilities.slash_ability import SlashAbility
+
+from globals import player_unit
 
 ally_X = [300, 200, 200]
 ally_Y = [400, 250, 550]
 ally_width = 150
 ally_height = 150
 ally_health_X = [100, 100, 100]
-ally_health_Y = [10, 40, 70]
+ally_health_Y = [10, 60, 110]
 
 enemy_x = [750, 850, 850]
 enemy_y = [400, 250, 550]
 enemy_width = 150
 enemy_height = 150
 enemy_health_x = [900, 900, 900]
-enemy_health_y = [10, 40, 70]
+enemy_health_y = [10, 60, 110]
 
 ABILITY_WIDTH = 50
 ABILITY_HEIGHT = 50
@@ -37,8 +39,18 @@ coeffs = {
     'speed': 1
 }
 
+sprite_paths = ['sprites/enemies/AMOGUS_1.png', 'sprites/enemies/AMOGUS_2.png', 'sprites/enemies/AMOGUS_3.png', 'sprites/enemies/AMOGUS_4.png']
+death_sprite_paths = ['sprites/enemies/AMOGUS_death_1.png', 'sprites/enemies/AMOGUS_death_2.png']
+names_array = ["Amogus", "Amogus", "Amogus"]
+clas_array = ["am", "og", "us"]
+sprite_paths_array = [sprite_paths, sprite_paths, sprite_paths]
+death_sprite_paths_array = [death_sprite_paths, death_sprite_paths, death_sprite_paths]
+
 class Stage:
-    def __init__(self, names_array, clas_array, sprite_paths_array, death_sprite_paths_array, stage_no, player_unit):
+    def __init__(self, stage_no):
+        # if stage_no == 0:
+            # add stage enemies and so on
+
         # add allies
         allies = []
         ally_units = []
@@ -48,25 +60,17 @@ class Stage:
                 ally_units.append(player_unit)
             else:
                 ally_units.append(FriendlyUnit(names_array[i], clas_array[i], Stats(10, 10, 10, 25 + (3 - i) * 5, 10), Stats(10, 10, 10, 25 + (3 - i) * 5, 10)))
-            ally_units[i].abilities.append(BasicAttack(coeffs, "attack", "WHO CARES", 0, 0, "physical", 'sprites/abilities/slash.png'))
-            ally_units[i].abilities.append(BasicHeal(coeffs, "heal", "WHO CARES", 0, 0, "physical", 'sprites/abilities/heal.png'))
-
-        ally_units[0].abilities.append(BasicAttack(coeffs, "attack", "WHO CARES", 0, 0, "physical", 'sprites/abilities/slash.png'))
-        ally_units[0].abilities.append(BasicAttack(coeffs, "attack", "WHO CARES", 0, 0, "physical", 'sprites/abilities/slash.png'))
-        ally_units[0].abilities.append(BasicAttack(coeffs, "attack", "WHO CARES", 0, 0, "physical", 'sprites/abilities/slash.png'))
-        ally_units[0].abilities.append(BasicAttack(coeffs, "attack", "WHO CARES", 0, 0, "physical", 'sprites/abilities/slash.png'))
-        ally_units[0].abilities.append(BasicAttack(coeffs, "attack", "WHO CARES", 0, 0, "physical", 'sprites/abilities/slash.png'))
-        ally_units[0].abilities.append(BasicAttack(coeffs, "attack", "WHO CARES", 0, 0, "physical", 'sprites/abilities/slash.png'))
+                ally_units[i].abilities.append(BasicAttack(coeffs, "attack", "WHO CARES", 0, 0, "physical", 'sprites/abilities/slash.png'))
+                ally_units[i].abilities.append(BasicHeal(coeffs, "heal", "WHO CARES", 0, 0, "physical", 'sprites/abilities/heal.png'))
 
 
-        # nu uita sa schimbi numele la enemy ca gen e doar unit cu tot cu bari si e stupid
         if len(names_array) == 2:
             for i in range(len(names_array)):
-                allies.append(Enemy(ally_X[i + 1], ally_Y[i + 1], ally_width, ally_height, 100, ally_health_X[i], ally_health_Y[i], 100, names_array[i], sprite_paths_array[i], death_sprite_paths_array[i], ally_units[i]))
+                allies.append(DisplayUnit(ally_X[i + 1], ally_Y[i + 1], ally_width, ally_height, getattr(ally_units[i].stats, 'vitality') * 10, ally_health_X[i], ally_health_Y[i], 100, getattr(ally_units[i].stats, 'intelligence') * 10, names_array[i], sprite_paths_array[i], death_sprite_paths_array[i], ally_units[i]))
 
         else:
             for i in range(len(names_array)):
-                allies.append(Enemy(ally_X[i], ally_Y[i], ally_width, ally_height, 100, ally_health_X[i], ally_health_Y[i], 100, names_array[i], sprite_paths_array[i], death_sprite_paths_array[i], ally_units[i]))
+                allies.append(DisplayUnit(ally_X[i], ally_Y[i], ally_width, ally_height, getattr(ally_units[i].stats, 'vitality') * 10, ally_health_X[i], ally_health_Y[i], 100, getattr(ally_units[i].stats, 'intelligence') * 10, names_array[i], sprite_paths_array[i], death_sprite_paths_array[i], ally_units[i]))
 
         # add enemies
         enemies = []
@@ -78,11 +82,11 @@ class Stage:
 
         if len(names_array) == 2:
             for i in range(len(names_array)):
-                enemies.append(Enemy(enemy_x[i + 1], enemy_y[i + 1], enemy_width, enemy_height, 100, enemy_health_x[i], enemy_health_y[i],100, names_array[i], sprite_paths_array[i], death_sprite_paths_array[i], enemy_units[i]))
+                enemies.append(DisplayUnit(enemy_x[i + 1], enemy_y[i + 1], enemy_width, enemy_height, getattr(enemy_units[i].stats, 'vitality') * 10, enemy_health_x[i], enemy_health_y[i],100, names_array[i], getattr(enemy_units[i].stats, 'intelligence') * 10, names_array[i], sprite_paths_array[i], death_sprite_paths_array[i], enemy_units[i]))
 
         else:
             for i in range(len(names_array)):
-                enemies.append(Enemy(enemy_x[i], enemy_y[i], enemy_width, enemy_height, 100, enemy_health_x[i], enemy_health_y[i], 100, names_array[i], sprite_paths_array[i], death_sprite_paths_array[i], enemy_units[i]))
+                enemies.append(DisplayUnit(enemy_x[i], enemy_y[i], enemy_width, enemy_height, getattr(enemy_units[i].stats, 'vitality') * 10, enemy_health_x[i], enemy_health_y[i], 100, getattr(enemy_units[i].stats, 'intelligence') * 10, names_array[i], sprite_paths_array[i], death_sprite_paths_array[i], enemy_units[i]))
 
         self.enemies = enemies
         self.allies = allies
@@ -133,17 +137,26 @@ class Stage:
         self.ability_sprites.empty()
 
         radius = 100
-        for i, ability in enumerate(abilities):
-            angle = 2 * math.pi * i / len(abilities)
+        for i in range(8):
+            ability = player_unit.abilities[i]
+            angle = 2 * math.pi * i / 8
             x = y = 0
             if self.selected_enemy is not None:
-                x = self.selected_enemy.rect.x + self.selected_enemy.rect.width / 2 + math.sin(angle) * radius
-                y = self.selected_enemy.rect.y + self.selected_enemy.rect.height / 2 + math.cos(angle) * radius
+                x = self.selected_enemy.rect.x + self.selected_enemy.rect.width / 2 + math.cos(angle) * radius
+                y = self.selected_enemy.rect.y + self.selected_enemy.rect.height / 2 + math.sin(angle) * radius
             elif self.selected_ally is not None:
-                x = self.selected_ally.rect.x + self.selected_ally.rect.width / 2 + math.sin(angle) * radius
-                y = self.selected_ally.rect.y + self.selected_ally.rect.height / 2 + math.cos(angle) * radius
-            sprite = AbilitySprite(x, y, ABILITY_WIDTH, ABILITY_HEIGHT, ability)
-            self.ability_sprites.add(sprite)
+                x = self.selected_ally.rect.x + self.selected_ally.rect.width / 2 + math.cos(angle) * radius
+                y = self.selected_ally.rect.y + self.selected_ally.rect.height / 2 + math.sin(angle) * radius
+
+            if ability is not None:
+                sprite = AbilitySprite(x, y, ABILITY_WIDTH, ABILITY_HEIGHT, ability)
+                self.ability_sprites.add(sprite)
+            else:
+                gray_circle = pygame.sprite.Sprite()
+                gray_circle.image = pygame.Surface((ABILITY_WIDTH, ABILITY_HEIGHT), pygame.SRCALPHA)
+                pygame.draw.circle(gray_circle.image, (200, 200, 200), (ABILITY_WIDTH // 2, ABILITY_HEIGHT // 2), ABILITY_WIDTH // 2)
+                gray_circle.rect = gray_circle.image.get_rect(center=(x, y))
+                self.ability_sprites.add(gray_circle)
 
     def use_ability(self, ability):
         self.selected_ability = ability
@@ -322,7 +335,9 @@ class Stage:
         # Check if the mouse is hovering over any ability button
         mouse_pos = pygame.mouse.get_pos()
         if self.choosing_ability and hasattr(self, 'ability_sprites'):
-            for sprite in self.ability_sprites:
+            for i, sprite in enumerate(self.ability_sprites):
+                if player_unit.abilities[i] is None:
+                    continue
                 if sprite.rect.collidepoint(mouse_pos):
                     # Draw the name and description of the ability
                     font = pygame.font.Font(None, 36)

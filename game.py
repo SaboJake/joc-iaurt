@@ -3,7 +3,7 @@ import pygame
 from units.player_unit import PlayerUnit
 from utils.button import Button
 from utils.health_bar import HealthBar
-from utils.enemy import Enemy
+from utils.display_unit import Enemy
 from utils.stage import Stage
 from ability_screen_utils.skill_tree import SkillTree
 from utils.stats import Stats

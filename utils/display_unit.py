@@ -3,12 +3,16 @@ import pygame
 from units.unit import Unit
 from utils.health_bar import HealthBar
 from utils.speed_bar import SpeedBar
+from utils.focus_bar import FocusBar
 
+BAR_HEIGHT = 20
+BOX_WIDTH = 50
 
-class Enemy:
-    def __init__(self, x, y, width, height, max_health, health_x, health_y, max_speed, name, sprite_paths, death_sprite_paths, unit: Unit):
+class DisplayUnit:
+    def __init__(self, x, y, width, height, max_health, health_x, health_y, max_speed, max_focus, name, sprite_paths, death_sprite_paths, unit: Unit):
         self.rect = pygame.Rect(x, y, width, height)
-        self.health_bar = HealthBar(health_x, health_y, 200, 20, max_health, name)
+        self.health_bar = HealthBar(health_x, health_y, 200, BAR_HEIGHT, max_health, name)
+        self.focus_bar = FocusBar(health_x, health_y + BAR_HEIGHT, 200, BAR_HEIGHT, max_focus, "")
         self.speed_bar = SpeedBar(x, y - height / 10 - 1, width, height / 10, max_speed)
         self.alive = True
         self.sprites = [pygame.transform.scale(pygame.image.load(path).convert_alpha(),
@@ -22,9 +26,15 @@ class Enemy:
 
     def draw(self, surface):
         if self.alive:
+            # box to the right of the bars
+            box_rect = pygame.Rect(self.health_bar.x + self.health_bar.width, self.health_bar.y, BOX_WIDTH, BAR_HEIGHT * 2)
+            pygame.draw.rect(surface, (0, 0, 0), box_rect)
+            # pygame.draw.rect(surface, (255, 255, 255), box_rect, 1)
+
             self.current_frame = (self.current_frame + self.animation_speed) % len(self.sprites)
             surface.blit(self.sprites[int(self.current_frame)], self.rect.topleft)
             self.health_bar.draw(surface)
+            self.focus_bar.draw(surface)
             self.speed_bar.draw(surface)
         elif not self.death_animation_done:
             if self.current_frame < len(self.death_sprites) - 1:
