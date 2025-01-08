@@ -5,14 +5,14 @@ from items.item import Item
 from units.friendly_unit import FriendlyUnit
 from utils.stats import Stats
 from utils.button import Button
-from globals import friendly_units
+from globals import friendly_units, player_unit
 
 
 # Add sample unit to friendly_units
 unit_stats1 = Stats(10, 10, 10, 10, 10)
 unit_stats2 = Stats(5, 5, 5, 5, 5)
 unit = FriendlyUnit("Player", "Guardian", unit_stats1, unit_stats1)
-friendly_units["Player"] = unit
+friendly_units["Player"] = player_unit
 friendly_units["Ally1"] = FriendlyUnit("Ally1", "Combat Medic", unit_stats2, unit_stats2)
 
 # Initialize Pygame

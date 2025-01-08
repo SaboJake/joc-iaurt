@@ -71,6 +71,7 @@ def ability_screen_event_handler(event):
                 selected_ability.x = x
                 selected_ability.y = y
                 ability_wheel.slots[wheel_index] = AbilitySprite(selected_ability.x, selected_ability.y, SLOT_SIZE, SLOT_SIZE, selected_ability.ability)
+                player_unit.abilities[wheel_index] = selected_ability.ability
                 selected_ability = None
             else:
                 selected_ability = None

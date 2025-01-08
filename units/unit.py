@@ -40,7 +40,7 @@ class Unit:
         self.crit_chance = 0.05
 
         # List of abilities
-        self.abilities = []
+        self.abilities = [None] * 8
 
     # Should be called every time a coefficient is changed
     def update_stats(self):
