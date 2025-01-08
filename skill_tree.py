@@ -3,6 +3,12 @@ import pygame
 from abilities.basic_attack import BasicAttack
 from abilities.ability_sprite import AbilitySprite
 
+# Define constants
+SLOT_SIZE = 30
+GRID_OFFSET_X = 100
+GRID_OFFSET_Y = 100
+GRID_SPACING = 75
+
 coeffs = {
     'strength': 1,
     'intelligence': 1,
@@ -16,36 +22,31 @@ class SkillTree:
         self.rows = 5
         self.cols = 4
 
-        self.grid = []
-        for i in range(5):
-            abilities_row = []
-            for j in range(4):
-                if (i == 0 and j == 0) or (i == 0 and j == 2) or (i == 1 and j == 0):
-                    ability = BasicAttack(coeffs, "attack", "WHO CARES", 0, 0, "physical", 'sprites/abilities/slash.png')
-                    abilities_row.append(AbilitySprite(0, 0, 50, 50, (255, 0, 0, 100), ability, 'sprites/abilities/slash.png'))
-                else:
-                    abilities_row.append(None)
-            self.grid.append(abilities_row)
+        self.grid = [[None for _ in range(self.cols)] for _ in range(self.rows)]
 
-        self.selected_ability = None
+        # add abilities to the grid
+        ability = BasicAttack(coeffs, "attack", "WHO CARES", 0, 0, "physical", 'sprites/abilities/slash.png')
+        self.grid[0][0] = AbilitySprite(0, 0, SLOT_SIZE, SLOT_SIZE, ability)
+        self.grid[0][1] = AbilitySprite(0, 0, SLOT_SIZE, SLOT_SIZE, ability)
+        self.grid[1][0] = AbilitySprite(0, 0, SLOT_SIZE, SLOT_SIZE, ability)
 
     def draw(self, surface):
         for row in range(self.rows):
             for col in range(self.cols):
-                x = col * 60 + 100
-                y = row * 60 + 100
-                pygame.draw.rect(surface, (255, 255, 255), (x, y, 50, 50), 2)
+                x = col * GRID_SPACING + GRID_OFFSET_X
+                y = row * GRID_SPACING + GRID_OFFSET_Y
 
                 if not self.grid[row][col] is None:
-                    # if not self.grid[row][col].bought:
-                    #     self.grid[row][col].gray_out(surface, x, y)
+                    # pygame.draw.rect(surface, (255, 255, 255), (x, y, SLOT_SIZE, SLOT_SIZE), 2)
                     surface.blit(self.grid[row][col].image, (x, y))
+                    if not self.grid[row][col].bought:
+                        self.grid[row][col].gray_out(surface, x, y)
 
     def handle_event(self, event):
         if event.type == pygame.MOUSEBUTTONDOWN:
             mouse_pos = pygame.mouse.get_pos()
-            col = (mouse_pos[0] - 100) // 60
-            row = (mouse_pos[1] - 100) // 60
+            col = (mouse_pos[0] - GRID_OFFSET_X) // GRID_SPACING
+            row = (mouse_pos[1] - GRID_OFFSET_Y) // GRID_SPACING
             if 0 <= row < self.rows and 0 <= col < self.cols:
                 self.selected_ability = self.grid[row][col]
                 if self.selected_ability:

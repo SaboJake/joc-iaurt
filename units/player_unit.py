@@ -6,7 +6,8 @@ class PlayerUnit(FriendlyUnit):
         super().__init__(name, clas, base_stats, stats, level)
         self.exp = 0
         self.exp_to_next_level = 100
-        self.skill_points = 100
+        self.skill_points = 1
+        self.stat_points = 5
 
     def gain_exp(self, exp):
         self.exp += exp
