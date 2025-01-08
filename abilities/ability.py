@@ -28,3 +28,6 @@ class Ability:
         if self.target == 'enemy' and not target.is_enemy:
             return False
         return True
+
+    def get_upgrade_description(self):
+        return ''

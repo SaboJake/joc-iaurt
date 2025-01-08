@@ -37,3 +37,6 @@ class BasicAttack(Ability):
         damage = max(1, damage)
         # target.health -= damage
         return damage
+
+    def get_upgrade_description(self):
+        return f"strength: {self.coeffs['strength']} -> {self.coeffs['strength'] * 1.5}\nspeed: {self.coeffs['speed']} -> {self.coeffs['speed'] * 1.5}\n"

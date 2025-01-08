@@ -26,3 +26,30 @@ class AbilitySprite(pygame.sprite.Sprite):
         # Apply the mask to the image
         gray_image = gray_image.copy()
         gray_image.blit(mask, (0, 0), special_flags=pygame.BLEND_RGBA_MIN)
+
+    def show_info(self, surface):
+        font = pygame.font.Font(None, 24)
+        mouse_pos = pygame.mouse.get_pos()
+
+        if self.rect.collidepoint(mouse_pos):
+            ability = self.ability
+            ability_info = f"Name: {ability.name}\nLevel: {ability.level}\n{ability.get_upgrade_description()}"
+            lines = ability_info.split('\n')
+
+            # Calculate the size of the text box
+            padding = 5
+            max_width = max(font.size(line)[0] for line in lines) + 2 * padding
+            total_height = (len(lines) - 1) * font.get_height() + 2 * padding
+
+            # Draw black box
+            box_x = mouse_pos[0] + 10
+            box_y = mouse_pos[1] + 10
+            pygame.draw.rect(surface, (0, 0, 0), (box_x, box_y, max_width, total_height))
+            pygame.draw.rect(surface, (255, 255, 255), (box_x, box_y, max_width, total_height), 2)
+
+            # Draw the text
+            for i, line in enumerate(lines):
+                text_surface = font.render(line, True, (255, 255, 255))
+                text_x = box_x + padding
+                text_y = box_y + padding + i * font.get_height()
+                surface.blit(text_surface, (text_x, text_y))

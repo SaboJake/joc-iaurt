@@ -33,3 +33,6 @@ class BasicHeal(Ability):
         heal = max(1, heal)
         # target.health += heal
         return heal
+
+    def get_upgrade_description(self):
+        return f"intelligence: {self.coeffs['intelligence']} -> {self.coeffs['intelligence'] * 1.5}\nspeed: {self.coeffs['speed']} -> {self.coeffs['speed'] * 1.5}\n"
