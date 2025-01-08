@@ -7,13 +7,14 @@ from utils.enemy import Enemy
 from utils.stage import Stage
 from ability_screen_utils.skill_tree import SkillTree
 from utils.stats import Stats
+from ability_screen import ability_screen_logic, ability_screen_event_handler
 
 # Initialize the game
 pygame.init()
 
 # Set up the screen
-screen = pygame.display.set_mode((1000, 750))
-surface = pygame.Surface((1000, 750), pygame.SRCALPHA)
+screen = pygame.display.set_mode((1200, 900))
+surface = pygame.Surface((1200, 900), pygame.SRCALPHA)
 
 # Set up the colors
 BLACK = (0, 0, 0)
@@ -44,8 +45,7 @@ enemy_damage_button = Button(310, 200, 200, 50, (255, 0, 0, 100), 'Damage Enemy'
 enemy_decrease_speed_button = Button(310, 250, 200, 50, (255, 0, 0, 100), 'Decrease Speed', lambda: enemy.speed_bar.update_value(-10))
 speed_coef = 1 / 5
 
-# create player unit
-player_unit = PlayerUnit("Darius", "Warrior", Stats(10, 10, 10, 35, 10, 10, 10, 10), Stats(10, 10, 10, 35, 10, 10, 10, 10))
+from globals import player_unit
 
 # Create stage
 stage = None
@@ -59,18 +59,18 @@ def start_stage():
     clas_array = ["am", "og", "us"]
     sprite_paths_array = [sprite_paths, sprite_paths, sprite_paths]
     death_sprite_paths_array = [death_sprite_paths, death_sprite_paths, death_sprite_paths]
-    stage = Stage(names_array, clas_array, sprite_paths_array, death_sprite_paths_array, stage_no)
+    stage = Stage(names_array, clas_array, sprite_paths_array, death_sprite_paths_array, stage_no, player_unit)
     global stage_active
     game_state = "stage"
 
 start_stage_button = Button(100, 200, 200, 100, (255, 0, 0, 100), 'Start Stage', lambda: start_stage())
 next_stage_button = Button(200, 200, 200, 100, (255, 0, 0, 100), 'Next Stage', lambda: start_stage())
 
-skill_tree = SkillTree(player_unit)
+skill_tree = SkillTree(player_unit, None)
 
 def open_skill_tree():
     global game_state
-    game_state = "skill_tree"
+    game_state = "ability_screen"
 
 skill_tree_button = Button(400, 400, 200, 100, (255, 0, 0, 100), 'Skill Tree', lambda: open_skill_tree())
 
@@ -102,8 +102,8 @@ while running:
             running = False
         if game_state == "stage":
             stage.inventory_event_handler(event, screen)
-        elif game_state == "skill_tree":
-            skill_tree.handle_event(event)
+        elif game_state == "ability_screen":
+            ability_screen_event_handler(event)
 
     # Update the game
     keys = pygame.key.get_pressed()
@@ -149,8 +149,8 @@ while running:
         screen.blit(game_menu_background, (0, 0))
         draw_game_menu()
 
-    elif game_state == "skill_tree":
-        skill_tree.draw(screen)
+    elif game_state == "ability_screen":
+        ability_screen_logic()
 
     pygame.display.flip()
 

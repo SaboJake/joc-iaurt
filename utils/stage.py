@@ -14,19 +14,22 @@ from units.friendly_unit import FriendlyUnit
 from utils.stats import Stats
 from abilities.slash_ability import SlashAbility
 
-ally_X = [250, 150, 150]
-ally_Y = [350, 200, 500]
+ally_X = [300, 200, 200]
+ally_Y = [400, 250, 550]
 ally_width = 150
 ally_height = 150
 ally_health_X = [100, 100, 100]
 ally_health_Y = [10, 40, 70]
 
-enemy_x = [600, 700, 700]
-enemy_y = [350, 200, 500]
+enemy_x = [750, 850, 850]
+enemy_y = [400, 250, 550]
 enemy_width = 150
 enemy_height = 150
-enemy_health_x = [750, 750, 750]
+enemy_health_x = [900, 900, 900]
 enemy_health_y = [10, 40, 70]
+
+ABILITY_WIDTH = 50
+ABILITY_HEIGHT = 50
 
 coeffs = {
     'strength': 1,
@@ -86,7 +89,7 @@ class Stage:
 
         self.delay = 0
         self.choosing_ability = False
-        self.end_turn_button = Button(475, 650, 50, 50, (255, 0, 0, 100), 'End Turn', lambda: self.end_turn())
+        self.end_turn_button = Button(575, 750, 50, 50, (255, 0, 0, 100), 'End Turn', lambda: self.end_turn())
 
         self.selected_enemy = None
         self.selected_ally = None
@@ -139,7 +142,7 @@ class Stage:
             elif self.selected_ally is not None:
                 x = self.selected_ally.rect.x + self.selected_ally.rect.width / 2 + math.sin(angle) * radius
                 y = self.selected_ally.rect.y + self.selected_ally.rect.height / 2 + math.cos(angle) * radius
-            sprite = AbilitySprite(x, y, 50, 50, (255, 0, 0, 100), ability, ability.sprite_path)
+            sprite = AbilitySprite(x, y, ABILITY_WIDTH, ABILITY_HEIGHT, ability)
             self.ability_sprites.add(sprite)
 
     def use_ability(self, ability):
