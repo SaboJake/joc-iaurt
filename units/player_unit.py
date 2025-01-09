@@ -8,6 +8,7 @@ class PlayerUnit(FriendlyUnit):
         self.exp_to_next_level = 100
         self.skill_points = 5
         self.stat_points = 5
+        self.abilities = [None] * 8
 
     def gain_exp(self, exp):
         self.exp += exp

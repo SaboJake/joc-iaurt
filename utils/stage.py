@@ -108,12 +108,12 @@ class Stage:
         self.selected_ability = None
         self.ability_sprites.empty()
 
-    def inventory_event_handler(self, event, surface):
+    def stage_event_handler(self, event, surface):
         if event.type == pygame.MOUSEBUTTONDOWN:
             mouse_pos = pygame.mouse.get_pos()
             if self.choosing_ability:
                 for sprite in self.ability_sprites:
-                    if sprite.rect.collidepoint(mouse_pos):
+                    if hasattr(sprite, 'ability') and sprite.rect.collidepoint(mouse_pos):
                         self.use_ability(sprite.ability)
                         return
 
@@ -133,7 +133,6 @@ class Stage:
 
     def display_abilities(self, surface):
         # display the abilities of the first ally
-        abilities = self.allies[0].unit.abilities
         self.ability_sprites.empty()
 
         radius = 100
@@ -169,7 +168,9 @@ class Stage:
             if self.selected_enemy.health_bar.target_value <= 0:
                 self.enemies.remove(self.selected_enemy)
         elif self.selected_ally is not None:
-            if ability.target != "ally":
+            if ability.target == "enemy":
+                return
+            if ability.target == "self" and self.selected_ally != self.allies[0]:
                 return
             heal_value = self.selected_ability.use(self.allies[0].unit, self.selected_ally.unit)
             print("used ability on ally, heal:", heal_value)
@@ -204,6 +205,8 @@ class Stage:
             target.update_health(heal_value)
 
         else:
+            for ability in ally.unit.abilities:
+                print(ability)
             # random attack ability
             ability = ally.unit.abilities[random.randint(0, len(ally.unit.abilities) - 1)]
             while ability.target != "enemy":
@@ -332,20 +335,14 @@ class Stage:
         if self.choosing_ability and hasattr(self, 'ability_sprites'):
             self.ability_sprites.draw(surface)
 
-        # Check if the mouse is hovering over any ability button
+        # show ability info when hovering
         mouse_pos = pygame.mouse.get_pos()
         if self.choosing_ability and hasattr(self, 'ability_sprites'):
             for i, sprite in enumerate(self.ability_sprites):
                 if player_unit.abilities[i] is None:
                     continue
                 if sprite.rect.collidepoint(mouse_pos):
-                    # Draw the name and description of the ability
-                    font = pygame.font.Font(None, 36)
-                    ability = sprite.ability
-                    text_surface = font.render(ability.name, True, (255, 255, 255))
-                    surface.blit(text_surface, (mouse_pos[0], mouse_pos[1] - 20))
-                    description_surface = font.render(ability.description, True, (255, 255, 255))
-                    surface.blit(description_surface, (mouse_pos[0], mouse_pos[1] + 20))
+                    self.ability_sprites.sprites()[i].show_info(surface)
                     break
 
     def all_enemies_dead(self):

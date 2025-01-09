@@ -86,7 +86,7 @@ if __name__ == "__main__":
             elif status_bar.current_screen == "ability":
                 ability_screen_event_handler(event)
             elif status_bar.current_screen == "stage":
-                stage.inventory_event_handler(event, screen)
+                stage.stage_event_handler(event, screen)
         screen.fill(BG_COLOR)
 
         if status_bar.current_screen == "":
