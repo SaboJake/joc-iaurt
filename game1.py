@@ -49,8 +49,8 @@ stage_no = 0
 
 def stage_screen():
     global stage, stage_no
-    status_bar.current_screen = "stage"
     stage = Stage(stage_no)
+    status_bar.current_screen = "stage"
 
 # Initialize buttons
 inventory_button = Button(10, 10, 150, 50, (0, 0, 255), 'Inventory', inventory_screen)

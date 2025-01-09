@@ -66,11 +66,11 @@ class Stage:
 
         if len(names_array) == 2:
             for i in range(len(names_array)):
-                allies.append(DisplayUnit(ally_X[i + 1], ally_Y[i + 1], ally_width, ally_height, getattr(ally_units[i].stats, 'vitality') * 10, ally_health_X[i], ally_health_Y[i], 100, getattr(ally_units[i].stats, 'intelligence') * 10, names_array[i], sprite_paths_array[i], death_sprite_paths_array[i], ally_units[i]))
+                allies.append(DisplayUnit(ally_X[i + 1], ally_Y[i + 1], ally_width, ally_height, ally_health_X[i], ally_health_Y[i], 100, names_array[i], sprite_paths_array[i], death_sprite_paths_array[i], ally_units[i]))
 
         else:
             for i in range(len(names_array)):
-                allies.append(DisplayUnit(ally_X[i], ally_Y[i], ally_width, ally_height, getattr(ally_units[i].stats, 'vitality') * 10, ally_health_X[i], ally_health_Y[i], 100, getattr(ally_units[i].stats, 'intelligence') * 10, names_array[i], sprite_paths_array[i], death_sprite_paths_array[i], ally_units[i]))
+                allies.append(DisplayUnit(ally_X[i], ally_Y[i], ally_width, ally_height, ally_health_X[i], ally_health_Y[i], 100, names_array[i], sprite_paths_array[i], death_sprite_paths_array[i], ally_units[i]))
 
         # add enemies
         enemies = []
@@ -82,11 +82,11 @@ class Stage:
 
         if len(names_array) == 2:
             for i in range(len(names_array)):
-                enemies.append(DisplayUnit(enemy_x[i + 1], enemy_y[i + 1], enemy_width, enemy_height, getattr(enemy_units[i].stats, 'vitality') * 10, enemy_health_x[i], enemy_health_y[i],100, names_array[i], getattr(enemy_units[i].stats, 'intelligence') * 10, names_array[i], sprite_paths_array[i], death_sprite_paths_array[i], enemy_units[i]))
+                enemies.append(DisplayUnit(enemy_x[i + 1], enemy_y[i + 1], enemy_width, enemy_height, enemy_health_x[i], enemy_health_y[i],100, names_array[i], sprite_paths_array[i], death_sprite_paths_array[i], enemy_units[i]))
 
         else:
             for i in range(len(names_array)):
-                enemies.append(DisplayUnit(enemy_x[i], enemy_y[i], enemy_width, enemy_height, getattr(enemy_units[i].stats, 'vitality') * 10, enemy_health_x[i], enemy_health_y[i], 100, getattr(enemy_units[i].stats, 'intelligence') * 10, names_array[i], sprite_paths_array[i], death_sprite_paths_array[i], enemy_units[i]))
+                enemies.append(DisplayUnit(enemy_x[i], enemy_y[i], enemy_width, enemy_height, enemy_health_x[i], enemy_health_y[i], 100, names_array[i], sprite_paths_array[i], death_sprite_paths_array[i], enemy_units[i]))
 
         self.enemies = enemies
         self.allies = allies
@@ -205,8 +205,6 @@ class Stage:
             target.update_health(heal_value)
 
         else:
-            for ability in ally.unit.abilities:
-                print(ability)
             # random attack ability
             ability = ally.unit.abilities[random.randint(0, len(ally.unit.abilities) - 1)]
             while ability.target != "enemy":
@@ -284,6 +282,7 @@ class Stage:
 
             # if speed bar is charged, attack
             if ally.speed_bar.target_value == ally.speed_bar.max_value:
+                ally.unit.update_stats()
 
                 # wait for the player (first friendly unit) to choose an ability
                 if i == 1:
@@ -312,6 +311,7 @@ class Stage:
 
             # if speed bar is charged, attack
             if enemy.speed_bar.target_value == enemy.speed_bar.max_value:
+                enemy.unit.update_stats()
 
                 # enemy ai
                 self.enemy_action(enemy)
@@ -354,4 +354,4 @@ class Stage:
 
     def player_dead(self):
         # if a unit dies, it is removed from its list, so if the fist unit is not the player, he died
-        return not self.allies[0].alive
+        return not self.allies[0].unit.is_player()

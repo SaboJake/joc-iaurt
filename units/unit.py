@@ -2,7 +2,7 @@ from utils.stats import Stats
 
 
 class Unit:
-    BASE_HEALTH_COEF = 10
+    BASE_HEALTH_COEF = 20
 
     class Coeff:
         def __init__(self, additive=0, multi=1, true=0):
