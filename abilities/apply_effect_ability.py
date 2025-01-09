@@ -10,3 +10,7 @@ class ApplyEffectAbility(Ability):
         if not super().use(user, target):
             return 0
         target.add_effect(self.effect)
+        return 0
+
+    def get_upgrade_description(self):
+        return "Amongus"

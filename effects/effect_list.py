@@ -9,6 +9,7 @@ class Wound(Effect):
         self.user = user
 
     def apply(self, target: Unit):
-        for key, value in self.coeffs:
+        for key, value in self.coeffs.items():
             dec = value * getattr(self.user.stats, key)
+            print(key, getattr(self.user.stats, key))
             target.health -= dec

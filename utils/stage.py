@@ -293,6 +293,8 @@ class Stage:
                 # ally ai
                 self.ally_action(ally)
 
+                ally.unit.apply_effects()
+
                 ally.speed_bar.update_value(-ally.speed_bar.max_value)
                 self.delay = 90
                 return
@@ -313,6 +315,8 @@ class Stage:
 
                 # enemy ai
                 self.enemy_action(enemy)
+
+                enemy.unit.apply_effects()
 
                 enemy.speed_bar.update_value(-enemy.speed_bar.max_value)
                 self.delay = 90
