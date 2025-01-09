@@ -1,4 +1,4 @@
-from effects.effect import Effect
+from effect_list.effect import Effect
 
 
 class MultiEffect(Effect):

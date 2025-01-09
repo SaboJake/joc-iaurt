@@ -1,8 +1,11 @@
 import pygame
 import textwrap
 
+from abilities.apply_effect_ability import ApplyEffectAbility
 from abilities.basic_attack import BasicAttack
 from abilities.ability_sprite import AbilitySprite
+from effects.effect_list import Wound
+from globals import player_unit
 
 # Define constants
 SLOT_SIZE = 40
@@ -21,6 +24,11 @@ coeffs = {
     'speed': 1
 }
 
+wound_coeffs = {
+    'strength': 0.3,
+}
+
+wound_effect = Wound("Wound", 3, "physical", True, wound_coeffs, player_unit)
 
 def draw_ability(ability_sprite, surface, x, y):
     surface.blit(ability_sprite.image, (x, y))
@@ -45,9 +53,10 @@ class SkillTree:
 
         # add abilities to the grid
         ability = BasicAttack(coeffs, "attack", "WHO CARES", 0, 0, "physical", 'sprites/abilities/slash.png')
+        wound_ability = ApplyEffectAbility(wound_effect, "Wound", "Applies wound effect", 0, 0, "physical", 'sprites/abilities/slash.png')
         self.grid[0][0] = AbilitySprite(GRID_OFFSET_X + 0 * GRID_SPACING + SLOT_SIZE / 2, GRID_OFFSET_Y + 0 * GRID_SPACING + SLOT_SIZE / 2, SLOT_SIZE, SLOT_SIZE, ability)
         self.grid[0][1] = AbilitySprite(GRID_OFFSET_X + 1 * GRID_SPACING + SLOT_SIZE / 2, GRID_OFFSET_Y + 0 * GRID_SPACING + SLOT_SIZE / 2, SLOT_SIZE, SLOT_SIZE, ability)
-        self.grid[1][0] = AbilitySprite(GRID_OFFSET_X + 0 * GRID_SPACING + SLOT_SIZE / 2, GRID_OFFSET_Y + 1 * GRID_SPACING + SLOT_SIZE / 2, SLOT_SIZE, SLOT_SIZE, ability,
+        self.grid[1][0] = AbilitySprite(GRID_OFFSET_X + 0 * GRID_SPACING + SLOT_SIZE / 2, GRID_OFFSET_Y + 1 * GRID_SPACING + SLOT_SIZE / 2, SLOT_SIZE, SLOT_SIZE, wound_ability,
                                         prereqs=[self.grid[0][0]])
 
         self.ability_pool = ability_pool
