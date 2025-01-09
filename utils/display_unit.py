@@ -2,6 +2,7 @@ from math import floor
 
 import pygame
 
+from combat_hud.display_effect import DisplayEffect
 from units.unit import Unit
 from utils.health_bar import HealthBar
 from utils.speed_bar import SpeedBar
@@ -9,6 +10,9 @@ from utils.focus_bar import FocusBar
 
 BAR_HEIGHT = 20
 BOX_WIDTH = 50
+
+EFFECT_HEIGHT = 50
+EFFECT_WIDTH = 20
 
 from constants import HEALTH_CONSTANT
 
@@ -28,6 +32,11 @@ class DisplayUnit:
         self.death_animation_done = False
         self.unit = unit
 
+        self.health_x = health_x
+        self.health_y = health_y
+
+        self.effects = []
+
     def draw(self, surface):
         if self.alive:
             self.health_bar.max_value = HEALTH_CONSTANT * getattr(self.unit.stats, 'vitality')
@@ -43,6 +52,9 @@ class DisplayUnit:
             self.health_bar.draw(surface)
             self.focus_bar.draw(surface)
             self.speed_bar.draw(surface)
+
+            for effect in self.effects:
+                effect.draw(surface)
         elif not self.death_animation_done:
             if self.current_frame < len(self.death_sprites) - 1:
                 self.current_frame += self.animation_speed
@@ -55,3 +67,19 @@ class DisplayUnit:
         if self.health_bar.target_value <= 0:
             self.alive = False
             self.current_frame = 0
+
+    def get_next_position(self, last_x):
+        if self.unit.is_enemy():
+            return last_x - EFFECT_WIDTH
+        return last_x + EFFECT_WIDTH
+
+    def update_effects(self):
+        new_effects = []
+        last_x = self.health_x - EFFECT_WIDTH
+        last_y = self.health_y
+        for effects in self.unit.effects:
+            if effects.duration <= 0:
+                continue
+            new_effects.append(DisplayEffect(effects, last_x, last_y, EFFECT_WIDTH, EFFECT_HEIGHT))
+            last_x = self.get_next_position(last_x)
+        self.effects = new_effects

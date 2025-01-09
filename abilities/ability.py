@@ -20,7 +20,7 @@ class Ability:
         return 1
 
     def check_valid_target(self, user, target):
-        print(self.target)
+        # print(self.target)
         if self.target == 'self' and user != target:
             return False
         if self.target == 'ally' and target.is_enemy:

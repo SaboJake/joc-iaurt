@@ -1,4 +1,4 @@
-from effect_list.effect import Effect
+from effects.effect import Effect
 from units.unit import Unit
 
 mod_map = {
@@ -13,8 +13,8 @@ mod_map = {
 # modifier - damage dealt/taken, healing dealt/received, crit chance
 # Only multiplicative changes
 class ModifyModEffect(Effect):
-    def __init__(self, name, duration, effect, element, can_stack, mult, mod):
-        super().__init__(name, duration, effect, element, can_stack)
+    def __init__(self, name, description, duration, effect, element, can_stack, mult, mod):
+        super().__init__(name, description, duration, effect, element, can_stack)
         self.mult = mult
         self.mod = mod
 
@@ -25,3 +25,6 @@ class ModifyModEffect(Effect):
     def remove(self, target: Unit):
         if self.mod in mod_map:
             setattr(target, mod_map[self.mod], getattr(target, mod_map[self.mod]) / self.mult)
+
+    def copy(self):
+        return ModifyModEffect(self.name, self.description, self.duration, self.effect, self.element, self.can_stack, self.mult, self.mod)

@@ -5,4 +5,5 @@ class DisplayItem:
         self.sprite = sprite
 
     def display(self):
-        print(self.item)
+        # print(self.item)
+        pass

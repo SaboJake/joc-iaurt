@@ -28,7 +28,7 @@ wound_coeffs = {
     'strength': 0.3,
 }
 
-wound_effect = Wound("Wound", 3, "physical", True, wound_coeffs, player_unit)
+wound_effect = Wound("Wound", "Deal damage over time", 3, "physical", True, wound_coeffs, player_unit)
 
 def draw_ability(ability_sprite, surface, x, y):
     surface.blit(ability_sprite.image, (x, y))

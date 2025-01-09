@@ -1,9 +1,9 @@
-from effect_list.effect import Effect
+from effects.effect import Effect
 
 
 class MultiEffect(Effect):
-    def __init__(self, name, duration, effect, element, can_stack, effects):
-        super().__init__(name, duration, effect, element, can_stack)
+    def __init__(self, name, description, duration, effect, element, can_stack, effects):
+        super().__init__(name, description, duration, effect, element, can_stack)
         # Array of effects to apply
         self.effects = effects
 
@@ -14,3 +14,6 @@ class MultiEffect(Effect):
     def remove(self, target):
         for effect in self.effects:
             effect.remove(target)
+
+    def copy(self):
+        return MultiEffect(self.name, self.description, self.duration, self.effect, self.element, self.can_stack, self.effects)
