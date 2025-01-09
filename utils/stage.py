@@ -202,7 +202,6 @@ class Stage:
 
             heal_value = ability.use(ally.unit, target.unit)
             print("ally " + str(ally) + " heal " + str(heal_value))
-            target.update_health(heal_value)
 
         else:
             # random attack ability
@@ -214,7 +213,6 @@ class Stage:
             target = self.enemies[random.randint(0, len(self.enemies) - 1)]
             damage_value = ability.use(ally.unit, target.unit)
             print("ally " + str(ally) + " damage " + str(damage_value))
-            target.update_health(-damage_value)
             if target.health_bar.target_value <= 0:
                 self.enemies.remove(target)
 

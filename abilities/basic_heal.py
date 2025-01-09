@@ -31,7 +31,8 @@ class BasicHeal(Ability):
         heal *= 1 + target.healing_received_mod
         # healing ignores target defence
         heal = max(1, heal)
-        # target.health += heal
+        heal = round(heal)
+        target.health += heal
         return heal
 
     def get_upgrade_description(self):

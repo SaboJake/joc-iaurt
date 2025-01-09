@@ -12,4 +12,5 @@ class Wound(Effect):
         for key, value in self.coeffs.items():
             dec = value * getattr(self.user.stats, key)
             print(key, getattr(self.user.stats, key))
+            dec = round(dec)
             target.health -= dec

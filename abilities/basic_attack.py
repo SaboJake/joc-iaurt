@@ -35,7 +35,8 @@ class BasicAttack(Ability):
         else:
             damage -= target.stats.elemental_defence
         damage = max(1, damage)
-        # target.health -= damage
+        damage = round(damage)
+        target.health -= damage
         return damage
 
     def get_upgrade_description(self):

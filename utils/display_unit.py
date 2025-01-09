@@ -1,3 +1,5 @@
+from math import floor
+
 import pygame
 
 from units.unit import Unit
@@ -29,7 +31,7 @@ class DisplayUnit:
     def draw(self, surface):
         if self.alive:
             self.health_bar.max_value = HEALTH_CONSTANT * getattr(self.unit.stats, 'vitality')
-            self.update_health(self.unit.health - self.health_bar.target_value)
+            self.update_health(floor(self.unit.health - self.health_bar.target_value))
 
             # box to the right of the bars
             box_rect = pygame.Rect(self.health_bar.x + self.health_bar.width, self.health_bar.y, BOX_WIDTH, BAR_HEIGHT * 2)
