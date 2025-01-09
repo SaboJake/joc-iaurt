@@ -39,10 +39,10 @@ coeffs = {
     'speed': 1
 }
 
-sprite_paths = ['sprites/enemies/AMOGUS_1.png', 'sprites/enemies/AMOGUS_2.png', 'sprites/enemies/AMOGUS_3.png', 'sprites/enemies/AMOGUS_4.png']
+sprite_paths = ['sprites/enemies/AMOGUS_1.png']#, 'sprites/enemies/AMOGUS_2.png', 'sprites/enemies/AMOGUS_3.png', 'sprites/enemies/AMOGUS_4.png']
 death_sprite_paths = ['sprites/enemies/AMOGUS_death_1.png', 'sprites/enemies/AMOGUS_death_2.png']
-names_array = ["Amogus", "Amogus", "Amogus"]
-clas_array = ["am", "og", "us"]
+names_array = ["Amogus"]#, "Amogus", "Amogus"]
+clas_array = ["am"]#, "og", "us"]
 sprite_paths_array = [sprite_paths, sprite_paths, sprite_paths]
 death_sprite_paths_array = [death_sprite_paths, death_sprite_paths, death_sprite_paths]
 
