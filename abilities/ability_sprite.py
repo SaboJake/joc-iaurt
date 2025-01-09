@@ -5,7 +5,7 @@ import pygame
 MAX_BOX_WIDTH = 200
 
 class AbilitySprite(pygame.sprite.Sprite):
-    def __init__(self, x, y, width, height, ability):
+    def __init__(self, x, y, width, height, ability, prereqs=[]):
         super().__init__()
         self.image = pygame.image.load(ability.sprite_path).convert_alpha()
         self.image = pygame.transform.scale(self.image, (width, height))
@@ -18,6 +18,8 @@ class AbilitySprite(pygame.sprite.Sprite):
         # Apply the mask to the image
         self.image = self.image.copy()
         self.image.blit(mask, (0, 0), special_flags=pygame.BLEND_RGBA_MIN)
+
+        self.prereqs = prereqs
 
 
     def gray_out(self, surface, x, y):

@@ -21,6 +21,19 @@ coeffs = {
     'speed': 1
 }
 
+
+def draw_ability(ability_sprite, surface, x, y):
+    surface.blit(ability_sprite.image, (x, y))
+    if not ability_sprite.bought:
+        ability_sprite.gray_out(surface, x, y)
+
+
+def draw_prereq(ability_sprite, surface, x, y):
+    for prereq in ability_sprite.prereqs:
+        color = (255, 255, 0) if prereq.bought else (150, 150, 150)
+        pygame.draw.line(surface, color, ability_sprite.rect.center, prereq.rect.center, 4)
+
+
 class SkillTree:
     def __init__(self, player_unit, ability_pool):
         self.player_unit = player_unit
@@ -34,23 +47,23 @@ class SkillTree:
         ability = BasicAttack(coeffs, "attack", "WHO CARES", 0, 0, "physical", 'sprites/abilities/slash.png')
         self.grid[0][0] = AbilitySprite(GRID_OFFSET_X + 0 * GRID_SPACING + SLOT_SIZE / 2, GRID_OFFSET_Y + 0 * GRID_SPACING + SLOT_SIZE / 2, SLOT_SIZE, SLOT_SIZE, ability)
         self.grid[0][1] = AbilitySprite(GRID_OFFSET_X + 1 * GRID_SPACING + SLOT_SIZE / 2, GRID_OFFSET_Y + 0 * GRID_SPACING + SLOT_SIZE / 2, SLOT_SIZE, SLOT_SIZE, ability)
-        self.grid[1][0] = AbilitySprite(GRID_OFFSET_X + 0 * GRID_SPACING + SLOT_SIZE / 2, GRID_OFFSET_Y + 1 * GRID_SPACING + SLOT_SIZE / 2, SLOT_SIZE, SLOT_SIZE, ability)
+        self.grid[1][0] = AbilitySprite(GRID_OFFSET_X + 0 * GRID_SPACING + SLOT_SIZE / 2, GRID_OFFSET_Y + 1 * GRID_SPACING + SLOT_SIZE / 2, SLOT_SIZE, SLOT_SIZE, ability,
+                                        prereqs=[self.grid[0][0]])
 
         self.ability_pool = ability_pool
 
-    def draw(self, surface):
+    def draw_util(self, surface, action):
         for row in range(self.rows):
             for col in range(self.cols):
                 x = col * GRID_SPACING + GRID_OFFSET_X
                 y = row * GRID_SPACING + GRID_OFFSET_Y
 
                 if not self.grid[row][col] is None:
-                    # pygame.draw.rect(surface, (255, 255, 255), (x, y, SLOT_SIZE, SLOT_SIZE), 2)
-                    surface.blit(self.grid[row][col].image, (x, y))
-                    if not self.grid[row][col].bought:
-                        self.grid[row][col].gray_out(surface, x, y)
+                    action(self.grid[row][col], surface, x, y)
 
-                    # self.grid[row][col].show_info(surface)
+    def draw(self, surface):
+        self.draw_util(surface, draw_prereq)
+        self.draw_util(surface, draw_ability)
 
         self.draw_player_info(surface)
 
@@ -86,6 +99,11 @@ class SkillTree:
         if self.player_unit.skill_points < 1:
             print("Not enough skill points")
             return
+
+        for prereq in ability_sprite.prereqs:
+            if not prereq.bought:
+                print("Prereqs not met")
+                return
 
         if not ability_sprite.bought:
             ability_sprite.bought = True
