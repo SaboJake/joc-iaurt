@@ -1,0 +1,3 @@
+
+
+HEALTH_CONSTANT = 20

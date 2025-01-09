@@ -1,6 +1,6 @@
 from utils.stats import Stats
 
-from globals import HEALTH_CONSTANT
+from constants import HEALTH_CONSTANT
 
 class Unit:
 

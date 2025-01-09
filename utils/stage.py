@@ -15,7 +15,7 @@ from utils.stats import Stats
 from abilities.slash_ability import SlashAbility
 
 from globals import player_unit
-from globals import HEALTH_CONSTANT
+from constants import HEALTH_CONSTANT
 
 ally_X = [300, 200, 200]
 ally_Y = [400, 250, 550]

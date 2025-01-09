@@ -10,7 +10,7 @@ from utils.focus_bar import FocusBar
 BAR_HEIGHT = 20
 BOX_WIDTH = 50
 
-from globals import HEALTH_CONSTANT
+from constants import HEALTH_CONSTANT
 
 class DisplayUnit:
     def __init__(self, x, y, width, height, health_x, health_y, max_speed, name, sprite_paths, death_sprite_paths, unit: Unit):
