@@ -1,8 +1,8 @@
 from utils.stats import Stats
 
+from globals import HEALTH_CONSTANT
 
 class Unit:
-    BASE_HEALTH_COEF = 20
 
     class Coeff:
         def __init__(self, additive=0, multi=1, true=0):
@@ -16,7 +16,7 @@ class Unit:
         self.name = name
         self.stats = stats
         self.base_stats = base_stats
-        self.health = stats.vitality * self.BASE_HEALTH_COEF
+        self.health = stats.vitality * HEALTH_CONSTANT
         self.level = level
         self.effects = []
         self.coeffs = {

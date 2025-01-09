@@ -15,6 +15,7 @@ from utils.stats import Stats
 from abilities.slash_ability import SlashAbility
 
 from globals import player_unit
+from globals import HEALTH_CONSTANT
 
 ally_X = [300, 200, 200]
 ally_Y = [400, 250, 550]
@@ -48,6 +49,7 @@ death_sprite_paths_array = [death_sprite_paths, death_sprite_paths, death_sprite
 
 class Stage:
     def __init__(self, stage_no):
+        player_unit.health = player_unit.stats.vitality * HEALTH_CONSTANT
         # if stage_no == 0:
             # add stage enemies and so on
 

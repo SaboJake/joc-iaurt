@@ -9,14 +9,14 @@ from utils.focus_bar import FocusBar
 
 BAR_HEIGHT = 20
 BOX_WIDTH = 50
-HEALTH_CONSTANT = 20
-FOCUS_CONSTANT = 20
+
+from globals import HEALTH_CONSTANT
 
 class DisplayUnit:
     def __init__(self, x, y, width, height, health_x, health_y, max_speed, name, sprite_paths, death_sprite_paths, unit: Unit):
         self.rect = pygame.Rect(x, y, width, height)
         self.health_bar = HealthBar(health_x, health_y, 200, BAR_HEIGHT, HEALTH_CONSTANT * getattr(unit.stats, 'vitality'), name)
-        self.focus_bar = FocusBar(health_x, health_y + BAR_HEIGHT, 200, BAR_HEIGHT, FOCUS_CONSTANT * getattr(unit.stats, 'intelligence'), "")
+        self.focus_bar = FocusBar(health_x, health_y + BAR_HEIGHT, 200, BAR_HEIGHT, getattr(unit.stats, 'focus'), "")
         self.speed_bar = SpeedBar(x, y - height / 10 - 1, width, height / 10, max_speed)
         self.alive = True
         self.sprites = [pygame.transform.scale(pygame.image.load(path).convert_alpha(),
