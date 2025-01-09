@@ -32,6 +32,10 @@ class DisplayUnit:
         self.death_animation_done = False
         self.unit = unit
 
+        self.damage_amount = 0
+        self.damage_display_time = 0
+        self.damage_font = None
+
         self.health_x = health_x
         self.health_y = health_y
 
@@ -55,6 +59,22 @@ class DisplayUnit:
 
             for effect in self.effects:
                 effect.draw(surface)
+
+            # Display damage number
+            if self.damage_display_time > 0:
+                damage_text = self.damage_font.render(str(self.damage_amount), True, self.damage_color)
+                outline_color = (0, 0, 0)
+                outline_texts = [
+                    self.damage_font.render(str(self.damage_amount), True, outline_color)
+                    for _ in range(8)
+                ]
+                offsets = [(-1, -1), (0, -1), (1, -1), (-1, 0), (1, 0), (-1, 1), (0, 1), (1, 1)]
+                for outline_text, offset in zip(outline_texts, offsets):
+                    surface.blit(outline_text, (
+                    self.rect.centerx - outline_text.get_width() // 2 + offset[0], self.rect.y - 20 + offset[1]))
+                surface.blit(damage_text, (self.rect.centerx - damage_text.get_width() // 2, self.rect.y - 20))
+                self.damage_display_time -= 1
+
         elif not self.death_animation_done:
             if self.current_frame < len(self.death_sprites) - 1:
                 self.current_frame += self.animation_speed
@@ -67,6 +87,26 @@ class DisplayUnit:
         if self.health_bar.target_value <= 0:
             self.alive = False
             self.current_frame = 0
+
+    def display_damage(self,amount, damage_type):
+        if amount == 0:
+            return
+        self.damage_amount = amount
+        self.damage_display_time = 60
+
+        font_size = max(24, min(144, amount))
+        self.damage_font = pygame.font.Font(None, font_size)
+
+        if damage_type == "heal":
+            self.damage_color = (0, 255, 0)
+        elif damage_type == "physical":
+            self.damage_color = (255, 0, 0)
+        elif damage_type == "elemental":
+            self.damage_color = (0, 0, 255)
+        elif damage_type == "effect":
+            self.damage_color = (255, 0, 255)
+        else:
+            self.damage_color = (255, 255, 255)
 
     def get_next_position(self, last_x):
         if self.unit.is_enemy():

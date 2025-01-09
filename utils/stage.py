@@ -6,7 +6,6 @@ import pygame
 from abilities.ability_sprite import AbilitySprite
 from abilities.basic_attack import BasicAttack
 from abilities.basic_heal import BasicHeal
-from combat_hud.display_effect import DisplayEffect
 from units.player_unit import PlayerUnit
 from utils.button import Button
 from utils.display_unit import DisplayUnit
@@ -14,6 +13,7 @@ from units.unit import Unit
 from units.friendly_unit import FriendlyUnit
 from utils.stats import Stats
 from abilities.slash_ability import SlashAbility
+from combat_hud.display_effect import DisplayEffect
 
 from globals import player_unit
 from constants import HEALTH_CONSTANT
@@ -104,6 +104,11 @@ class Stage:
 
         self.ability_sprites = pygame.sprite.Group()
 
+        self.dead_units = []
+        self.return_value = "ongoing"
+        self.end_delay = 0
+        self.stage_ended = False
+
     def end_turn(self):
         self.choosing_ability = False
         self.selected_enemy = None
@@ -133,6 +138,11 @@ class Stage:
                         self.selected_enemy = None
                         self.display_abilities(surface)
                         return
+
+                # clicked outside the sprites
+                self.selected_enemy = None
+                self.selected_ally = None
+                self.ability_sprites.empty()
 
     def display_abilities(self, surface):
         # display the abilities of the first ally
@@ -166,17 +176,30 @@ class Stage:
             if ability.target != "enemy":
                 return
             damage_value = self.selected_ability.use(self.allies[0].unit, self.selected_enemy.unit)
-            # print("used ability on enemy, damage:", damage_value)
+            print("used ability on enemy, damage:", damage_value)
             self.selected_enemy.update_health(-damage_value)
+
+            # show damage above sprite
+            if damage_value > 0:
+                damage_type = None
+                if hasattr(self.selected_ability, 'element'):
+                    damage_type = self.selected_ability.element
+                self.selected_enemy.display_damage(damage_value, damage_type)
+
             if self.selected_enemy.health_bar.target_value <= 0:
                 self.enemies.remove(self.selected_enemy)
+                self.dead_units.append(self.selected_enemy)
+
+
         elif self.selected_ally is not None:
             if ability.target == "enemy":
                 return
             if ability.target == "self" and self.selected_ally != self.allies[0]:
                 return
             heal_value = self.selected_ability.use(self.allies[0].unit, self.selected_ally.unit)
-            # print("used ability on ally, heal:", heal_value)
+            self.selected_enemy.display_damage(heal_value, "heal")
+
+            print("used ability on ally, heal:", heal_value)
             self.selected_ally.update_health(heal_value)
 
         self.choosing_ability = False
@@ -185,7 +208,7 @@ class Stage:
         self.selected_ability = None
         self.ability_sprites.empty()
 
-        self.delay = 10
+        self.delay = 90
 
     def ally_action(self, ally):
 
@@ -204,7 +227,8 @@ class Stage:
                 ability = ally.unit.abilities[random.randint(0, len(ally.unit.abilities) - 1)]
 
             heal_value = ability.use(ally.unit, target.unit)
-            # print("ally " + str(ally) + " heal " + str(heal_value))
+            target.display_damage(heal_value, "heal")
+            print("ally " + str(ally) + " heal " + str(heal_value))
 
         else:
             # random attack ability
@@ -215,9 +239,11 @@ class Stage:
             # random target
             target = self.enemies[random.randint(0, len(self.enemies) - 1)]
             damage_value = ability.use(ally.unit, target.unit)
-            # print("ally " + str(ally) + " damage " + str(damage_value))
+            target.display_damage(damage_value, ability.element)
+            print("ally " + str(ally) + " damage " + str(damage_value))
             if target.health_bar.target_value <= 0:
                 self.enemies.remove(target)
+                self.dead_units.append(target)
 
     def enemy_action(self, enemy):
 
@@ -235,7 +261,8 @@ class Stage:
                 ability = enemy.unit.abilities[random.randint(0, len(enemy.unit.abilities) - 1)]
 
             heal_value = ability.use(enemy.unit, target.unit)
-            # print("enemy " + str(enemy) + " heal " + str(heal_value))
+            target.display_damage(heal_value, "heal")
+            print("enemy " + str(enemy) + " heal " + str(heal_value))
             target.update_health(heal_value)
 
         else:
@@ -247,21 +274,57 @@ class Stage:
             # random target
             target = self.allies[random.randint(0, len(self.allies) - 1)]
             damage_value = ability.use(enemy.unit, target.unit)
-            # print("ally " + str(enemy) + " damage " + str(damage_value))
+            target.display_damage(damage_value, ability.element)
+            print("ally " + str(enemy) + " damage " + str(damage_value))
             target.update_health(-damage_value)
             if target.health_bar.target_value <= 0:
                 self.allies.remove(target)
+                self.dead_units.append(target)
+
+    def check_stage_ended(self):
+        if self.stage_ended:
+            return
+        if self.all_enemies_dead():
+            self.return_value = "victory"
+            self.stage_ended = True
+            self.end_delay = 300
+        elif self.player_dead():
+            self.return_value = "defeat"
+            self.stage_ended = True
+            self.end_delay = 300
 
     def update(self):
+        self.check_stage_ended()
+        if self.stage_ended:
+            self.end_delay -= 1
+
+            # update only sprites, no game logic
+            for ally in self.allies:
+                ally.speed_bar.update()
+                ally.health_bar.update()
+                ally.update_effects()
+            for enemy in self.enemies:
+                enemy.speed_bar.update()
+                enemy.health_bar.update()
+                enemy.update_effects()
+
+            if self.end_delay == 0:
+                return self.return_value
+            return "ongoing"
+
         for ally in self.allies:
             ally.speed_bar.update()
             ally.health_bar.update()
             ally.update_effects()
+            if (ally.health_bar.target_value != ally.health_bar.current_value) and self.delay == 0:
+                self.delay += 1
 
         for enemy in self.enemies:
             enemy.speed_bar.update()
             enemy.health_bar.update()
             enemy.update_effects()
+            if (enemy.health_bar.target_value != enemy.health_bar.current_value) and self.delay == 0:
+                self.delay += 1
 
         # wait for the player to choose an ability
         if self.choosing_ability:
@@ -281,7 +344,7 @@ class Stage:
             i += 1
 
             # update speed bar
-            ally.speed_bar.update_speed(ally.unit.stats.speed / 10)
+            ally.speed_bar.update_speed(ally.unit.stats.speed / 50)
 
             # if speed bar is charged, attack
             if ally.speed_bar.target_value == ally.speed_bar.max_value:
@@ -295,40 +358,44 @@ class Stage:
                 # ally ai
                 self.ally_action(ally)
 
-                ally.unit.apply_effects()
+                damage_value = ally.unit.apply_effects()
+                ally.display_damage(damage_value, "effect")
 
                 ally.speed_bar.update_value(-ally.speed_bar.max_value)
-                self.delay = 10
+                self.delay = 90
                 return
 
             # if ally is dead, remove it
             if ally.health_bar.target_value <= 0:
                 self.allies.remove(ally)
-                # print("ally " + str(i) + " died")
+                self.dead_units.append(ally)
+                print("ally " + str(i) + " died")
 
         i = 0
         for enemy in self.enemies:
             i += 1
 
-            enemy.speed_bar.update_speed(enemy.unit.stats.speed / 10) # speed coeff
+            enemy.speed_bar.update_speed(enemy.unit.stats.speed / 50) # speed coeff
 
             # if speed bar is charged, attack
             if enemy.speed_bar.target_value == enemy.speed_bar.max_value:
                 enemy.unit.update_stats()
 
                 # enemy ai
-                # self.enemy_action(enemy)
+                self.enemy_action(enemy)
 
-                enemy.unit.apply_effects()
+                damage_value = enemy.unit.apply_effects()
+                enemy.display_damage(damage_value, "effect")
 
                 enemy.speed_bar.update_value(-enemy.speed_bar.max_value)
-                self.delay = 10
+                self.delay = 90
                 return
 
             # if enemy is dead, remove it
             if enemy.health_bar.target_value <= 0:
                 self.enemies.remove(enemy)
-                # print("enemy " + str(i) + " died")
+                self.dead_units.append(enemy)
+                print("enemy " + str(i) + " died")
 
     def draw(self, surface):
         for enemy in self.enemies:
@@ -336,6 +403,11 @@ class Stage:
 
         for ally in self.allies:
             ally.draw(surface)
+
+        for dead_unit in self.dead_units:
+            if dead_unit.death_animation_done:
+                self.dead_units.remove(dead_unit)
+            dead_unit.draw(surface)
 
         self.end_turn_button.draw(surface)
 
@@ -368,5 +440,7 @@ class Stage:
         return all(not enemy.alive for enemy in self.enemies)
 
     def player_dead(self):
+        if len(self.allies) == 0:
+            return True
         # if a unit dies, it is removed from its list, so if the fist unit is not the player, he died
         return not self.allies[0].unit.is_player()

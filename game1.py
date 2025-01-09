@@ -107,11 +107,13 @@ if __name__ == "__main__":
             exit_button.draw(screen)
             status_bar.draw()
         elif status_bar.current_screen == "stage":
-            stage.update()
-            if stage.all_enemies_dead():
+            ret = stage.update()
+            if ret == "victory":
                 stage_no += 1
+                print("Victory!!")
                 status_bar.current_screen = ""
-            if stage.player_dead():
+            elif ret == "defeat":
+                print("Defeat!!")
                 status_bar.current_screen = ""
 
             screen.blit(background_image, (0, 0))

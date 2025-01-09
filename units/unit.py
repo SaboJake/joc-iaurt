@@ -67,14 +67,15 @@ class Unit:
             self.effects.append(effect)
 
     def apply_effects(self):
+        total = 0
         new_effects = []
         for effect in self.effects:
-            effect.apply(self)
+            total += effect.apply(self)
             effect.duration -= 1
             if effect.duration > 0:
                 new_effects.append(effect)
         self.effects = new_effects
-
+        return total
 
 
     def is_enemy(self):

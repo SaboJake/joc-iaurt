@@ -14,6 +14,7 @@ class Effect:
     # target is a unit object
     def apply(self, target: Unit):
         self.effect(target)
+        return 0
 
     def remove(self, target: Unit):
         pass
