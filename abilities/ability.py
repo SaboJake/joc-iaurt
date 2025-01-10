@@ -1,4 +1,7 @@
 
+def same_side(user, target):
+    return user.is_enemy() == target.is_enemy()
+
 class Ability:
     def __init__(self, name, description, cooldown, cost, target, sprite_path):
         self.name = name
@@ -14,8 +17,8 @@ class Ability:
     def use(self, user, target):
         if user.stats.focus < self.cost:
             return 0
-        # if not self.check_valid_target(user, target):
-        #     return 0 # gen verific eu sa atace ce trebuie si ma enerva ca voiam sa dea si inamicii heal si se futea
+        if not self.check_valid_target(user, target):
+             return 0
         user.stats.focus -= self.cost
         return 1
 
@@ -23,9 +26,9 @@ class Ability:
         # print(self.target)
         if self.target == 'self' and user != target:
             return False
-        if self.target == 'ally' and target.is_enemy:
+        if self.target == 'ally' and not same_side(user, target):
             return False
-        if self.target == 'enemy' and not target.is_enemy:
+        if self.target == 'enemy' and  same_side(user, target):
             return False
         return True
 

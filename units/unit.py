@@ -74,6 +74,8 @@ class Unit:
             effect.duration -= 1
             if effect.duration > 0:
                 new_effects.append(effect)
+            else:
+                effect.remove(self)
         self.effects = new_effects
         return total
 

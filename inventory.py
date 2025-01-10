@@ -3,6 +3,7 @@ import pygame
 from items.display_item import DisplayItem
 from items.item import Item
 from units.friendly_unit import FriendlyUnit
+from utils.bar import Bar
 from utils.stats import Stats
 from utils.button import Button
 from globals import friendly_units, player_unit
@@ -26,6 +27,9 @@ BG_COLOR = (50, 50, 50)
 SLOT_COLOR = (100, 100, 100)
 ITEM_COLOR = (200, 50, 50)
 FPS = 60
+
+equipment_bg_x, equipment_bg_y = 50, 150
+equipment_bg_width, equipment_bg_height = 500, 300
 
 # Offset values to move the inventory
 OFFSET_X = 800
@@ -226,6 +230,25 @@ def delete_selected_item():
         selected_item_pos = None
         print("Deleted selected item")
 
+xp_bar = Bar(equipment_bg_x + 250, equipment_bg_y - 25, 200, 20, 100, (100, 100, 100), (200, 200, 200))
+
+def display_xp_bar():
+    global xp_bar
+    xp_percentage = friendly_units.get(current_unit).get_xp_percentage()
+    xp_bar.target_value = xp_percentage
+    xp_bar.current_value = xp_percentage
+    xp_bar.draw(screen)
+
+    font = pygame.font.Font(None, 24)
+
+    xp_text = "XP"
+    xp_text_surface = font.render(xp_text, True, (255, 255, 255))
+    screen.blit(xp_text_surface, (xp_bar.x, xp_bar.y - 20))
+
+    percentage_text = f"{xp_percentage:.2f}%"
+    text_surface = font.render(percentage_text, True, (255, 255, 255))
+    screen.blit(text_surface, (xp_bar.x + xp_bar.width + 10, xp_bar.y))
+
 delete_message = None
 
 def display_delete_message():
@@ -352,6 +375,8 @@ def draw_item_info_logic():
         if unit_equipment[current_unit][equipment_slot]:
             draw_item_info(screen, unit_equipment[current_unit][equipment_slot].item, mouse_pos)
 
+
+
 def draw_item_following_mouse():
     global selected_item
     if selected_item:
@@ -380,8 +405,6 @@ def inventory_logic():
     ally1_button.draw(screen)
     delete_button.draw(screen)
 
-    equipment_bg_x, equipment_bg_y = 50, 150
-    equipment_bg_width, equipment_bg_height = 500, 300
     draw_equipment_background(screen, equipment_bg_x, equipment_bg_y, equipment_bg_width, equipment_bg_height)
 
     # Draw unit info above the equipment slots
@@ -392,6 +415,8 @@ def inventory_logic():
 
     # Draw player stats for the current unit
     draw_player_stats(screen, friendly_units.get(current_unit))
+
+    display_xp_bar()
 
     # Draw money value
     draw_money(screen, money, (OFFSET_X, OFFSET_Y + GRID_ROWS * SLOT_SIZE + 10))

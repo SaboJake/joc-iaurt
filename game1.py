@@ -1,7 +1,11 @@
 import pygame
 
+from end_battle_screen import EndBattleScreen
+from items.display_item import DisplayItem
+from items.item import Item
 from shop import shop_logic, shop_event_handler
 from utils.stage import Stage
+from utils.stats import Stats
 
 pygame.init()
 
@@ -67,10 +71,17 @@ def exit_menu():
 
 screen = pygame.display.set_mode((1200, 900))
 status_bar = StatusBar(screen, [inventory_button, ability_button])
-status_bar.current_screen = ""
+status_bar.current_screen = "end_battle"
 FPS = 60
 BG_COLOR = (0, 0, 0)
 clock = pygame.time.Clock()
+
+# Battle end screen for testing
+sample_stats = Stats(10, 10, 10, 10, 10)
+tricou1 = DisplayItem(Item("Tricou", "Tricou funny", "armor", sample_stats, 0, 0), "sprites/items/tricou_gucci.png")
+tricou2 = DisplayItem(Item("Tricou", "Tricou funny", "armor", sample_stats, 0, 0), "sprites/items/tricou_gucci.png")
+
+end_battle_screen = EndBattleScreen(screen, [], 20, 20, [tricou1, tricou2])
 
 if __name__ == "__main__":
     running = True
@@ -87,6 +98,8 @@ if __name__ == "__main__":
                 ability_screen_event_handler(event)
             elif status_bar.current_screen == "stage":
                 stage.stage_event_handler(event, screen)
+            elif status_bar.current_screen == "end_battle":
+                end_battle_screen.end_battle_handle_event(event)
         screen.fill(BG_COLOR)
 
         if status_bar.current_screen == "":
@@ -118,7 +131,10 @@ if __name__ == "__main__":
 
             screen.blit(background_image, (0, 0))
             stage.draw(screen)
-
+        elif status_bar.current_screen == "end_battle":
+            end_battle_screen.end_battle_screen_logic()
+            exit_button.draw(screen)
+            status_bar.draw()
         pygame.display.flip()
         clock.tick(FPS)
 

@@ -109,6 +109,7 @@ class Stage:
         self.end_delay = 0
         self.stage_ended = False
 
+    # Used for the end turn button (player)
     def end_turn(self):
         self.choosing_ability = False
         self.selected_enemy = None
@@ -173,8 +174,8 @@ class Stage:
     def use_ability(self, ability):
         self.selected_ability = ability
         if self.selected_enemy is not None:
-            if ability.target != "enemy":
-                return
+            # if ability.target != "enemy":
+            #     return
             damage_value = self.selected_ability.use(self.allies[0].unit, self.selected_enemy.unit)
             print("used ability on enemy, damage:", damage_value)
             self.selected_enemy.update_health(-damage_value)
@@ -192,10 +193,10 @@ class Stage:
 
 
         elif self.selected_ally is not None:
-            if ability.target == "enemy":
-                return
-            if ability.target == "self" and self.selected_ally != self.allies[0]:
-                return
+            # if ability.target == "enemy":
+            #     return
+            # if ability.target == "self" and self.selected_ally != self.allies[0]:
+            #     return
             heal_value = self.selected_ability.use(self.allies[0].unit, self.selected_ally.unit)
             self.selected_enemy.display_damage(heal_value, "heal")
 
@@ -294,6 +295,7 @@ class Stage:
             self.end_delay = 300
 
     def update(self):
+
         self.check_stage_ended()
         if self.stage_ended:
             self.end_delay -= 1
@@ -302,11 +304,10 @@ class Stage:
             for ally in self.allies:
                 ally.speed_bar.update()
                 ally.health_bar.update()
-                ally.update_effects()
+
             for enemy in self.enemies:
                 enemy.speed_bar.update()
                 enemy.health_bar.update()
-                enemy.update_effects()
 
             if self.end_delay == 0:
                 return self.return_value
