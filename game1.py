@@ -1,5 +1,8 @@
+import random
+
 import pygame
 
+from encounters.encounter_list import encounters
 from end_battle_screen import EndBattleScreen
 from items.display_item import DisplayItem
 from items.item import Item
@@ -71,7 +74,7 @@ def exit_menu():
 
 screen = pygame.display.set_mode((1200, 900))
 status_bar = StatusBar(screen, [inventory_button, ability_button])
-status_bar.current_screen = "end_battle"
+status_bar.current_screen = ""
 FPS = 60
 BG_COLOR = (0, 0, 0)
 clock = pygame.time.Clock()
@@ -81,7 +84,12 @@ sample_stats = Stats(10, 10, 10, 10, 10)
 tricou1 = DisplayItem(Item("Tricou", "Tricou funny", "armor", sample_stats, 0, 0), "sprites/items/tricou_gucci.png")
 tricou2 = DisplayItem(Item("Tricou", "Tricou funny", "armor", sample_stats, 0, 0), "sprites/items/tricou_gucci.png")
 
-end_battle_screen = EndBattleScreen(screen, [], 20, 20, [tricou1, tricou2])
+end_battle_screen = None
+
+def set_end_battle_screen():
+    global end_battle_screen, stage_no
+    encounters[stage_no].perform_drops()
+    end_battle_screen = EndBattleScreen(screen, [], encounters[stage_no].xp, encounters[stage_no].money, encounters[stage_no].dropped_items)
 
 if __name__ == "__main__":
     running = True
@@ -122,9 +130,10 @@ if __name__ == "__main__":
         elif status_bar.current_screen == "stage":
             ret = stage.update()
             if ret == "victory":
+                set_end_battle_screen()
                 stage_no += 1
                 print("Victory!!")
-                status_bar.current_screen = ""
+                status_bar.current_screen = "end_battle"
             elif ret == "defeat":
                 print("Defeat!!")
                 status_bar.current_screen = ""
