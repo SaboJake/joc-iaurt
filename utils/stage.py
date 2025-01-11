@@ -41,7 +41,7 @@ coeffs = {
     'speed': 1
 }
 
-sprite_paths = ['sprites/enemies/AMOGUS_1.png']#, 'sprites/enemies/AMOGUS_2.png', 'sprites/enemies/AMOGUS_3.png', 'sprites/enemies/AMOGUS_4.png']
+sprite_paths = ['sprites/enemies/AMOGUS_1.png', 'sprites/enemies/AMOGUS_2.png', 'sprites/enemies/AMOGUS_3.png', 'sprites/enemies/AMOGUS_4.png']
 death_sprite_paths = ['sprites/enemies/AMOGUS_death_1.png', 'sprites/enemies/AMOGUS_death_2.png']
 names_array = ["Amogus"]#, "Amogus", "Amogus"]
 clas_array = ["am"]#, "og", "us"]
@@ -198,7 +198,7 @@ class Stage:
             # if ability.target == "self" and self.selected_ally != self.allies[0]:
             #     return
             heal_value = self.selected_ability.use(self.allies[0].unit, self.selected_ally.unit)
-            self.selected_enemy.display_damage(heal_value, "heal")
+            self.selected_ally.display_damage(heal_value, "heal")
 
             print("used ability on ally, heal:", heal_value)
             self.selected_ally.update_health(heal_value)
@@ -302,28 +302,22 @@ class Stage:
 
             # update only sprites, no game logic
             for ally in self.allies:
-                ally.speed_bar.update()
-                ally.health_bar.update()
-
+                ally.update_sprite()
             for enemy in self.enemies:
-                enemy.speed_bar.update()
-                enemy.health_bar.update()
+                enemy.update_sprite()
 
             if self.end_delay == 0:
                 return self.return_value
             return "ongoing"
 
         for ally in self.allies:
-            ally.speed_bar.update()
-            ally.health_bar.update()
+            ally.update_sprite()
             ally.update_effects()
             if (ally.health_bar.target_value != ally.health_bar.current_value) and self.delay == 0:
                 self.delay += 1
 
         for enemy in self.enemies:
-            enemy.speed_bar.update()
-            enemy.health_bar.update()
-            enemy.update_effects()
+            enemy.update_sprite()
             if (enemy.health_bar.target_value != enemy.health_bar.current_value) and self.delay == 0:
                 self.delay += 1
 
@@ -351,6 +345,21 @@ class Stage:
             if ally.speed_bar.target_value == ally.speed_bar.max_value:
                 ally.unit.update_stats()
 
+                is_stunned = False
+
+                for effect in ally.unit.effects:
+                    if hasattr(effect, 'is_stun'):
+                        ally.display_stun()
+                        self.delay = 90
+                        ally.speed_bar.update_value(-ally.speed_bar.max_value)
+                        is_stunned = True
+
+                damage_value = ally.unit.apply_effects()
+                ally.display_damage(damage_value, "effect")
+
+                if is_stunned:
+                    return
+
                 # wait for the player (first friendly unit) to choose an ability
                 if i == 1:
                     self.choosing_ability = True
@@ -358,9 +367,6 @@ class Stage:
 
                 # ally ai
                 self.ally_action(ally)
-
-                damage_value = ally.unit.apply_effects()
-                ally.display_damage(damage_value, "effect")
 
                 ally.speed_bar.update_value(-ally.speed_bar.max_value)
                 self.delay = 90
@@ -381,12 +387,25 @@ class Stage:
             # if speed bar is charged, attack
             if enemy.speed_bar.target_value == enemy.speed_bar.max_value:
                 enemy.unit.update_stats()
+                enemy.update_effects()
 
-                # enemy ai
-                self.enemy_action(enemy)
+                is_stunned = False
+
+                for effect in enemy.unit.effects:
+                    if hasattr(effect, 'is_stun'):
+                        enemy.display_stun()
+                        self.delay = 90
+                        enemy.speed_bar.update_value(-enemy.speed_bar.max_value)
+                        is_stunned = True
 
                 damage_value = enemy.unit.apply_effects()
                 enemy.display_damage(damage_value, "effect")
+
+                if is_stunned:
+                    return
+
+                # enemy ai
+                self.enemy_action(enemy)
 
                 enemy.speed_bar.update_value(-enemy.speed_bar.max_value)
                 self.delay = 90

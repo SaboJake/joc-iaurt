@@ -15,11 +15,11 @@ class Ability:
         self.max_level = 3
 
     def use(self, user, target):
-        if user.stats.focus < self.cost:
+        if user.current_focus < self.cost:
             return 0
         if not self.check_valid_target(user, target):
              return 0
-        user.stats.focus -= self.cost
+        user.current_focus -= self.cost
         return 1
 
     def check_valid_target(self, user, target):

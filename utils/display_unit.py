@@ -36,6 +36,8 @@ class DisplayUnit:
         self.damage_display_time = 0
         self.damage_font = None
 
+        self.stun_display_time = 0
+
         self.health_x = health_x
         self.health_y = health_y
 
@@ -45,6 +47,9 @@ class DisplayUnit:
         if self.alive:
             self.health_bar.max_value = HEALTH_CONSTANT * getattr(self.unit.stats, 'vitality')
             self.update_health(floor(self.unit.health - self.health_bar.target_value))
+
+            self.focus_bar.max_value = getattr(self.unit.stats, 'focus')
+            self.focus_bar.update_value(floor(self.unit.current_focus - self.focus_bar.target_value))
 
             # box to the right of the bars
             box_rect = pygame.Rect(self.health_bar.x + self.health_bar.width, self.health_bar.y, BOX_WIDTH, BAR_HEIGHT * 2)
@@ -59,6 +64,13 @@ class DisplayUnit:
 
             for effect in self.effects:
                 effect.draw(surface)
+
+            # Display stun
+            if self.stun_display_time > 0:
+                font = pygame.font.Font(None, 80)
+                stun_text = font.render("Stunned", True, (100, 100, 255))
+                surface.blit(stun_text, (self.rect.centerx - stun_text.get_width() // 2, self.rect.y))
+                self.stun_display_time -= 1
 
             # Display damage number
             if self.damage_display_time > 0:
@@ -88,14 +100,20 @@ class DisplayUnit:
             self.alive = False
             self.current_frame = 0
 
-    def display_damage(self,amount, damage_type):
+    def update_sprite(self):
+        self.speed_bar.update()
+        self.health_bar.update()
+        self.focus_bar.update()
+
+    def display_damage(self, amount, damage_type):
         if amount == 0:
             return
+
         self.damage_amount = amount
-        self.damage_display_time = 60
 
         font_size = max(24, min(144, amount))
         self.damage_font = pygame.font.Font(None, font_size)
+        self.damage_display_time = 60
 
         if damage_type == "heal":
             self.damage_color = (0, 255, 0)
@@ -107,6 +125,9 @@ class DisplayUnit:
             self.damage_color = (255, 0, 255)
         else:
             self.damage_color = (255, 255, 255)
+
+    def display_stun(self):
+        self.stun_display_time = 60
 
     def get_next_position(self, last_x):
         if self.unit.is_enemy():

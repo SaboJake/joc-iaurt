@@ -17,6 +17,8 @@ class Unit:
         self.stats = stats
         self.base_stats = base_stats
         self.health = stats.vitality * HEALTH_CONSTANT
+        self.current_focus = stats.focus
+        self.is_stunned = False
         self.level = level
         self.effects = []
         self.coeffs = {
