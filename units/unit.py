@@ -39,7 +39,7 @@ class Unit:
         self.healing_mod = 0
         self.healing_received_mod = 0
         # Base crit chance
-        self.crit_chance = 0.05
+        self.crit_chance = 0.15
 
         # List of abilities
         self.abilities = []

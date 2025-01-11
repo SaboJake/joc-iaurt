@@ -6,6 +6,7 @@ import pygame
 from abilities.ability_sprite import AbilitySprite
 from abilities.basic_attack import BasicAttack
 from abilities.basic_heal import BasicHeal
+from encounters.encounter_list import encounters
 from units.player_unit import PlayerUnit
 from utils.button import Button
 from utils.display_unit import DisplayUnit
@@ -66,6 +67,10 @@ class Stage:
                 ally_units[i].abilities.append(BasicAttack(coeffs, "attack", "WHO CARES", 0, 0, "physical", 'sprites/abilities/slash.png'))
                 ally_units[i].abilities.append(BasicHeal(coeffs, "heal", "WHO CARES", 0, 0, "physical", 'sprites/abilities/heal.png'))
 
+        for ally in ally_units:
+            ally.update_stats()
+            ally.health = ally.stats.vitality * HEALTH_CONSTANT
+            ally.current_focus = ally.stats.focus
 
         if len(names_array) == 2:
             for i in range(len(names_array)):
@@ -77,11 +82,11 @@ class Stage:
 
         # add enemies
         enemies = []
-        enemy_units = []
-        for i in range(len(names_array)):
-            enemy_units.append(Unit(names_array[i], Stats(10, 10, 10, 25 + i * 5, 10), Stats(10, 10, 10, 25 + i * 5, 10)))
-            enemy_units[i].abilities.append(BasicAttack(coeffs, "WHO", "CARES", 0, 0, "physical", 'sprites/abilities/slash.png'))
-            enemy_units[i].abilities.append(BasicHeal(coeffs, "WHO", "CARES", 0, 0, "physical", 'sprites/abilities/heal.png'))
+        enemy_units = encounters[stage_no].enemies
+        # for i in range(len(names_array)):
+        #     enemy_units.append(Unit(names_array[i], Stats(10, 10, 10, 25 + i * 5, 10), Stats(10, 10, 10, 25 + i * 5, 10)))
+        #     enemy_units[i].abilities.append(BasicAttack(coeffs, "WHO", "CARES", 0, 0, "physical", 'sprites/abilities/slash.png'))
+        #     enemy_units[i].abilities.append(BasicHeal(coeffs, "WHO", "CARES", 0, 0, "physical", 'sprites/abilities/heal.png'))
 
         if len(names_array) == 2:
             for i in range(len(names_array)):
