@@ -30,6 +30,6 @@ class Bar:
 
     def update(self):
         if self.current_value > self.target_value:
-            self.current_value = max(self.target_value, self.current_value - self.decrease_speed)
+            self.current_value = max(self.target_value, self.current_value - self.decrease_speed / 100 * self.max_value)
         elif self.current_value < self.target_value:
-            self.current_value = min(self.target_value, self.current_value + self.decrease_speed)
+            self.current_value = min(self.target_value, self.current_value + self.decrease_speed / 100 * self.max_value)

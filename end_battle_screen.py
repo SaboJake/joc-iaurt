@@ -18,7 +18,7 @@ class EndBattleScreen:
         self.items = items
         self.surface = surface
         self.item_positions = []
-        self.xp_bar = Bar(OFFSET_X, OFFSET_Y + 300, 200, 20, level_requirements[player_unit.level + 1] - level_requirements[player_unit.level], (100, 100, 100), (200, 200, 200))
+        self.xp_bar = Bar(100, OFFSET_Y, 200, 20, level_requirements[player_unit.level + 1] - level_requirements[player_unit.level], (100, 100, 100), (200, 200, 200))
         self.xp_bar.real_value =  self.xp_bar.target_value = self.xp_bar.current_value = player_unit.xp - level_requirements[player_unit.level]
         self.target_xp = 0
 
@@ -73,7 +73,7 @@ class EndBattleScreen:
         self.xp_bar.draw(self.surface)
         # if the player leveled up
         if self.xp_bar.current_value == self.xp_bar.max_value:
-            self.xp_bar = Bar(OFFSET_X, OFFSET_Y + 300, 200, 20, level_requirements[player_unit.level + 1] - level_requirements[player_unit.level], (100, 100, 100), (200, 200, 200))
+            self.xp_bar = Bar(100, OFFSET_Y, 200, 20, level_requirements[player_unit.level + 1] - level_requirements[player_unit.level], (100, 100, 100), (200, 200, 200))
             self.xp_bar.target_value = player_unit.xp - level_requirements[player_unit.level]
             self.xp_bar.current_value = self.xp_bar.real_value = 0
 
