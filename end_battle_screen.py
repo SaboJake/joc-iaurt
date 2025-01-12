@@ -1,7 +1,8 @@
 import pygame
 from inventory import draw_inventory, draw_item_info_logic, draw_item_following_mouse, draw_delete_logic, \
-    inventory_event_handler, delete_button, get_slot_at_mouse, set_selected_item, get_selected_item, SLOT_SIZE, draw_item_info
-from inventory import inventory, selected_item
+    inventory_event_handler, delete_button, get_slot_at_mouse, set_selected_item, get_selected_item, SLOT_SIZE, \
+    draw_item_info, get_inventory
+from inventory import selected_item
 from utils.bar import Bar
 from globals import player_unit
 from constants import level_requirements
@@ -62,7 +63,7 @@ class EndBattleScreen:
 
     def end_battle_screen_logic(self):
         self.display_rewards()
-        draw_inventory(self.surface, inventory, selected_item)
+        draw_inventory(self.surface, get_inventory(), selected_item)
         delete_button.draw(self.surface)
         draw_item_info_logic()
         draw_item_following_mouse()
