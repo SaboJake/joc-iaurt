@@ -16,5 +16,5 @@ class StatusBar:
             mouse_pos = pygame.mouse.get_pos()
             for button in self.buttons:
                 if button.rect.collidepoint(mouse_pos):
-                    self.current_screen = button.action
+                    # self.current_screen = button.action
                     button.click()

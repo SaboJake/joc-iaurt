@@ -37,3 +37,9 @@ class AbilityPool:
         center_x = self.pos[0] + col * (self.slot_size + 10) + self.slot_size // 2
         center_y = self.pos[1] + row * (self.slot_size + 10) + self.slot_size // 2
         return center_x, center_y
+
+    def update_save_data(self, save_data):
+        save_data["ability_pool_abilities"] = self.abilities
+
+    def get_save_data(self, save_data):
+        self.abilities = save_data["ability_pool_abilities"]

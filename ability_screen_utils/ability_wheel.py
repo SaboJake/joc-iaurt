@@ -29,3 +29,9 @@ class AbilityWheel:
             if distance <= self.slot_size // 2:
                 return i
         return None
+
+    def update_save_data(self, save_data):
+        save_data["ability_wheel"] = self.slots
+
+    def get_save_data(self, save_data):
+        self.slots = save_data["ability_wheel"]

@@ -17,6 +17,11 @@ class FriendlyUnit(Unit):
         self.items.remove(item)
         self.base_stats -= item.stats
 
+    def clear_items(self):
+        for item in self.items:
+            self.base_stats -= item.stats
+        self.items = []
+
     def is_enemy(self):
         return False
 

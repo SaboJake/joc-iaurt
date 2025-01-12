@@ -2,7 +2,7 @@ from abilities.ability import Ability
 
 
 class MultiAbility(Ability):
-    def __init__(self, abilities, name, description, cooldown, cost, target, sprite_path):
+    def __init__(self, abilities, name, description, cooldown, cost, target, sprite_path, max_equipped=10):
         super().__init__(name, description, cooldown, cost, target, sprite_path)
         self.abilities = abilities
 

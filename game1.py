@@ -4,19 +4,23 @@ import pygame
 
 from encounters.encounter_list import encounters
 from end_battle_screen import EndBattleScreen
-from globals import player_unit, money, add_money
+from globals import player_unit, money, add_money, get_money, set_save_data, get_save_data, set_money
 from items.display_item import DisplayItem
 from items.item import Item
+from save import save_variables, load_variables
 from shop import shop_logic, shop_event_handler
 from utils.stage import Stage
 from utils.stats import Stats
+from globals import save_data
 
 pygame.init()
 
 from utils.status_bar import StatusBar
 from utils.button import Button
-from inventory import inventory_logic, inventory_event_handler, set_equipment_slots
-from ability_screen import ability_screen_logic, ability_screen_event_handler
+from inventory import inventory_logic, inventory_event_handler, set_equipment_slots, update_save_data_inventory, \
+    get_save_data_inventory
+from ability_screen import ability_screen_logic, ability_screen_event_handler, update_save_data_abilities, \
+    get_save_data_abilities
 
 background_image = pygame.image.load('sprites/backgrounds/stage_background.png')
 game_menu_background = pygame.image.load('sprites/backgrounds/game_menu_background.png')
@@ -60,9 +64,28 @@ def stage_screen():
     stage = Stage(stage_no)
     status_bar.current_screen = "stage"
 
+def save():
+    new_save_data = {}
+    new_save_data["money"] = get_money()
+    new_save_data["stage_no"] = stage_no
+    update_save_data_inventory(new_save_data)
+    update_save_data_abilities(new_save_data)
+    save_variables(new_save_data, "save_data")
+    set_save_data(new_save_data)
+
+def load():
+    global stage_no
+    set_save_data(load_variables("save_data"))
+    set_money(get_save_data()["money"])
+    stage_no = get_save_data()["stage_no"]
+    get_save_data_inventory(get_save_data())
+    get_save_data_abilities(get_save_data())
+
 # Initialize buttons
 inventory_button = Button(10, 10, 150, 50, (0, 0, 255), 'Inventory', inventory_screen)
 ability_button = Button(170, 10, 150, 50, (0, 0, 255), 'Abilities', ability_screen)
+save_button = Button(330, 10, 150, 50, (0, 0, 255), 'Save', save)
+load_button = Button(490, 10, 150, 50, (0, 0, 255), 'Load', load)
 # Exit screen button
 exit_button = Button(1200 - 150 - 10, 10, 150, 50, (255, 0, 0), 'Exit', lambda: exit_menu())
 # Shop button
@@ -74,7 +97,7 @@ def exit_menu():
     status_bar.current_screen = ""
 
 screen = pygame.display.set_mode((1200, 900))
-status_bar = StatusBar(screen, [inventory_button, ability_button])
+status_bar = StatusBar(screen, [inventory_button, ability_button, save_button, load_button])
 status_bar.current_screen = ""
 FPS = 60
 BG_COLOR = (0, 0, 0)

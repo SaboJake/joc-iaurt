@@ -66,7 +66,7 @@ class SkillTree:
         focus_attack = FocusAttack(coeffs, "Focus Attack", "Gain focus when attacking", 0, 0, "physical", 'sprites/abilities/quick_strike.png')
         wound_ability = ApplyEffectAbility(wound_effect, "Wound", "Applies wound effect", 0, 0, "physical", 'sprites/abilities/wound.png')
         weaken_ability = ApplyEffectAbility(weaken_effect, "Weaken", "Applies weaken effect", 0, 0, "physical", 'sprites/abilities/weaken.png')
-        stun_ability = ApplyEffectAbility(stun_effect, "Stun", "Applies stun effect", 0, 0, "physical", 'sprites/abilities/break.png')
+        stun_ability = ApplyEffectAbility(stun_effect, "Stun", "Applies stun effect", 0, 0, "physical", 'sprites/abilities/break.png', 1)
 
         self.grid[0][0] = AbilitySprite(GRID_OFFSET_X + 0 * GRID_SPACING + SLOT_SIZE / 2, GRID_OFFSET_Y + 0 * GRID_SPACING + SLOT_SIZE / 2, SLOT_SIZE, SLOT_SIZE, ability)
         self.grid[0][1] = AbilitySprite(GRID_OFFSET_X + 1 * GRID_SPACING + SLOT_SIZE / 2, GRID_OFFSET_Y + 0 * GRID_SPACING + SLOT_SIZE / 2, SLOT_SIZE, SLOT_SIZE, ability)
@@ -150,3 +150,14 @@ class SkillTree:
             self.player_unit.skill_points -= 1
             print(f"Upgraded ability: {ability_sprite.ability.name}")
 
+    def update_save_data(self, save_data):
+        save_data["skill_points"] = self.player_unit.skill_points
+        save_data["stat_points"] = self.player_unit.stat_points
+        save_data["ability_grid"] = self.grid
+        self.ability_pool.update_save_data(save_data)
+
+    def get_save_data(self, save_data):
+        self.player_unit.skill_points = save_data["skill_points"]
+        self.player_unit.stat_points = save_data["stat_points"]
+        self.grid = save_data["ability_grid"]
+        self.ability_pool.get_save_data(save_data)

@@ -24,8 +24,25 @@ screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("Ability Wheel and Pool")
 clock = pygame.time.Clock()
 
+def update_save_data_abilities(save_data):
+    global ability_pool, ability_wheel, skill_tree
+    skill_tree.update_save_data(save_data)
+    ability_pool.update_save_data(save_data)
+    ability_wheel.update_save_data(save_data)
+
+def get_save_data_abilities(save_data):
+    global ability_pool, ability_wheel, skill_tree
+    skill_tree.get_save_data(save_data)
+    ability_pool.get_save_data(save_data)
+    ability_wheel.get_save_data(save_data)
+    # Update the player unit's abilities
+    player_unit.abilities = [None] * len(ability_wheel.slots)
+    for i, ability in enumerate(ability_wheel.slots):
+        if ability:
+            player_unit.abilities[i] = ability.ability
+
 def ability_screen_logic():
-    global selected_ability, ability_wheel, ability_pool, screen
+    global selected_ability, ability_wheel, ability_pool, screen, message, message_display_time
     skill_tree.draw(screen)
     ability_wheel.draw(screen)
     ability_pool.draw(screen)
@@ -46,8 +63,30 @@ def ability_screen_logic():
         if slot:
             slot.show_info(screen)
 
+    if message and pygame.time.get_ticks() - message_display_time < MESSAGE_DURATION:
+        display_message(screen, message)
+    else:
+        message = ""
+
+def count_ability_in_wheel(ability):
+    return sum(1 for slot in ability_wheel.slots if slot and slot.ability == ability)
+
+# Add this to the global variables
+message = ""
+message_display_time = 0
+MESSAGE_DURATION = 2000  # Duration in milliseconds
+
+# Add this function to display the message
+def display_message(screen, message):
+    if message:
+        font = pygame.font.Font(None, 36)
+        text = font.render(message, True, (255, 0, 0))
+        text_rect = text.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT - 50))
+        screen.blit(text, text_rect)
+
+# Modify the ability_screen_event_handler function
 def ability_screen_event_handler(event):
-    global selected_ability, ability_wheel, ability_pool, running
+    global selected_ability, ability_wheel, ability_pool, running, message, message_display_time
     skill_tree.handle_event(event)
     if event.type == pygame.QUIT:
         running = False
@@ -64,14 +103,22 @@ def ability_screen_event_handler(event):
         else:
             wheel_index = ability_wheel.get_slot_at_pos(mouse_pos)
             if wheel_index is not None:
-                angle_step = 360 / ability_wheel.num_slots
-                angle = angle_step * wheel_index
-                x = ability_wheel.center[0] + ability_wheel.radius * math.cos(math.radians(angle))
-                y = ability_wheel.center[1] + ability_wheel.radius * math.sin(math.radians(angle))
-                selected_ability.x = x
-                selected_ability.y = y
-                ability_wheel.slots[wheel_index] = AbilitySprite(selected_ability.x, selected_ability.y, SLOT_SIZE, SLOT_SIZE, selected_ability.ability)
-                player_unit.abilities[wheel_index] = selected_ability.ability
+                if count_ability_in_wheel(selected_ability.ability) < selected_ability.ability.max_equipped:
+                    angle_step = 360 / ability_wheel.num_slots
+                    angle = angle_step * wheel_index
+                    x = ability_wheel.center[0] + ability_wheel.radius * math.cos(math.radians(angle))
+                    y = ability_wheel.center[1] + ability_wheel.radius * math.sin(math.radians(angle))
+                    selected_ability.x = x
+                    selected_ability.y = y
+                    ability_wheel.slots[wheel_index] = AbilitySprite(selected_ability.x, selected_ability.y, SLOT_SIZE, SLOT_SIZE, selected_ability.ability)
+                    player_unit.abilities[wheel_index] = selected_ability.ability
+                else:
+                    message = f"This ability can only be equipped"
+                    if selected_ability.ability.max_equipped == 1:
+                        message += " once"
+                    else:
+                        message += f" {selected_ability.ability.max_equipped} times"
+                    message_display_time = pygame.time.get_ticks()
                 selected_ability = None
             else:
                 selected_ability = None

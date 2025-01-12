@@ -21,6 +21,21 @@ class AbilitySprite(pygame.sprite.Sprite):
 
         self.prereqs = prereqs
 
+    def __getstate__(self):
+        state = self.__dict__.copy()
+        # Remove the image from the state
+        del state['image']
+        return state
+
+    def __setstate__(self, state):
+        self.__dict__.update(state)
+        # Recreate the image (you may need to adjust this part based on your needs)
+        self.image = pygame.image.load(self.ability.sprite_path).convert_alpha()
+        self.image = pygame.transform.scale(self.image, (self.rect.width, self.rect.height))
+        mask = pygame.Surface((self.rect.width, self.rect.height), pygame.SRCALPHA)
+        pygame.draw.ellipse(mask, (255, 255, 255, 255), mask.get_rect())
+        self.image.blit(mask, (0, 0), special_flags=pygame.BLEND_RGBA_MIN)
+
 
     def gray_out(self, surface, x, y):
         gray_image = pygame.Surface(self.image.get_size(), pygame.SRCALPHA)

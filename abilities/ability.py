@@ -3,7 +3,7 @@ def same_side(user, target):
     return user.is_enemy() == target.is_enemy()
 
 class Ability:
-    def __init__(self, name, description, cooldown, cost, target, sprite_path):
+    def __init__(self, name, description, cooldown, cost, target, sprite_path, max_equipped=10):
         self.name = name
         self.description = description
         self.cooldown = cooldown
@@ -13,6 +13,7 @@ class Ability:
         self.sprite_path = sprite_path
         self.level = 0
         self.max_level = 3
+        self.max_equipped = max_equipped
 
     def use(self, user, target):
         if user.current_focus < self.cost:

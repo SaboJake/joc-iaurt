@@ -6,10 +6,12 @@ from items.item import Item
 from utils.stats import Stats
 from utils.button import Button
 from inventory import draw_inventory, draw_money, delete_button, inventory_event_handler, inventory_logic, SLOT_SIZE, \
-    OFFSET_X, OFFSET_Y, GRID_ROWS, GRID_COLS, BG_COLOR, money, inventory, selected_item, draw_equipment_background, \
+    OFFSET_X, OFFSET_Y, GRID_ROWS, GRID_COLS, BG_COLOR, inventory, selected_item, draw_equipment_background, \
     draw_item_info_logic, draw_item_following_mouse, draw_delete_logic, draw_equipment, unit_equipment, current_unit, \
     set_equipment_slots, draw_item_info, delete_button_pos, DELETE_BUTTON_WIDTH, DELETE_BUTTON_HEIGHT, draw_message, \
-    get_selected_item, set_selected_item, display_error_message
+    get_selected_item, set_selected_item, display_error_message, get_unit_equipment, get_inventory
+
+from globals import add_money, get_money
 
 for_sale = []
 
@@ -78,10 +80,10 @@ def draw_item_info_with_cost(surface, item, pos):
 sell_message = None
 
 def sell_selected_item():
-    global money, sell_message
+    global sell_message
     if get_selected_item():
         sell_price = get_selected_item().item.price // 2  # Example: sell for half the price
-        money += sell_price
+        add_money(sell_price)
         print(f"Sold {get_selected_item().item.name} for {sell_price} RON")
         set_selected_item(None)
         sell_message = None
@@ -105,8 +107,8 @@ from inventory import get_selected_item, set_selected_item
 def shop_logic():
     global sell_message
     screen.fill(BG_COLOR)
-    draw_inventory(screen, inventory, get_selected_item())
-    draw_money(screen, money, (OFFSET_X, OFFSET_Y + GRID_ROWS * SLOT_SIZE + 10))
+    draw_inventory(screen, get_inventory(), get_selected_item())
+    draw_money(screen, get_money(), (OFFSET_X, OFFSET_Y + GRID_ROWS * SLOT_SIZE + 10))
     delete_button.draw(screen)
     sell_button.draw(screen)
 
@@ -115,7 +117,7 @@ def shop_logic():
     draw_equipment_background(screen, equipment_bg_x, equipment_bg_y, equipment_bg_width, equipment_bg_height)
 
     # Draw the equipment slots for the current unit
-    draw_equipment(screen, unit_equipment[current_unit])
+    draw_equipment(screen, get_unit_equipment()[current_unit])
 
     # Draw items for sale below the equipment
     draw_items_for_sale(screen, for_sale, (50, equipment_bg_y + equipment_bg_height + 50))
@@ -132,7 +134,6 @@ def shop_logic():
 
 
 def shop_event_handler(event):
-    global money
     inventory_event_handler(event)
     delete_button.handle_event(event)
     sell_button.handle_event(event)
@@ -143,8 +144,8 @@ def shop_event_handler(event):
         for index, item in enumerate(for_sale):
             item_rect = pygame.Rect(50, y_start + index * (SLOT_SIZE + 10), SLOT_SIZE, SLOT_SIZE)
             if item_rect.collidepoint(mouse_pos):
-                if money >= item.item.price and not get_selected_item():
-                    money -= item.item.price
+                if get_money() >= item.item.price and not get_selected_item():
+                    add_money(-item.item.price)
                     set_selected_item(DisplayItem(item.item, item.sprite))
                     print(f"Purchased {item.item.name} for {item.item.price} RON")
                 else:

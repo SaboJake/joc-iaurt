@@ -6,8 +6,7 @@ from units.friendly_unit import FriendlyUnit
 from utils.bar import Bar
 from utils.stats import Stats
 from utils.button import Button
-from globals import friendly_units, player_unit
-
+from globals import friendly_units, player_unit, get_money
 
 # Add sample unit to friendly_units
 unit_stats1 = Stats(10, 10, 10, 10, 10)
@@ -62,6 +61,14 @@ inventory = [[None for _ in range(GRID_COLS)] for _ in range(GRID_ROWS)]
 selected_item = None  # Holds the selected item
 selected_item_pos = None  # Original position of the selected item
 
+def get_inventory():
+    global inventory
+    return inventory
+
+def set_inventory(new_inventory):
+    global inventory
+    inventory = new_inventory
+
 def set_selected_item(item):
     global selected_item
     selected_item = item
@@ -80,6 +87,29 @@ inventory[2][2] = tricou
 
 # Equipment setup
 equipment = {slot: None for slot in equipment_slots}
+
+def update_save_data_inventory(save_data):
+    global inventory, equipment, unit_equipment
+    save_data["inventory"] = inventory
+    save_data["equipment"] = equipment
+    save_data["unit_equipment"] = unit_equipment
+
+
+def get_save_data_inventory(save_data):
+    global inventory, equipment, unit_equipment
+    inventory = save_data["inventory"]
+    equipment = save_data["equipment"]
+    unit_equipment = save_data["unit_equipment"]
+    # Reset equipment for each unit
+    for unit in friendly_units.values():
+        unit.clear_items()
+    for unit_name, equipment_slots in unit_equipment.items():
+        unit = friendly_units.get(unit_name)
+        if unit:
+            for item in equipment_slots.values():
+                if item:
+                    unit.add_item(item.item)
+
 
 def draw_inventory(surface, inventory, selected_item):
     """Draw the inventory grid and items."""
@@ -100,6 +130,14 @@ unit_equipment = {
     "Player": {slot: None for slot in equipment_slots},
     "Ally1": {slot: None for slot in equipment_slots}
 }
+
+def get_unit_equipment():
+    global unit_equipment
+    return unit_equipment
+
+def set_unit_equipment(new_unit_equipment):
+    global unit_equipment
+    unit_equipment = new_unit_equipment
 
 def draw_equipment_background(surface, x, y, width, height):
     """Draw the background for the equipment slots."""
@@ -273,8 +311,6 @@ def set_current_unit(unit_name):
     global current_unit
     current_unit = unit_name
 
-from globals import money
-
 running = True
 error_message = None
 error_message_pos = None
@@ -398,7 +434,7 @@ def inventory_logic():
     draw_inventory(screen, inventory, selected_item)
 
     # Draw money value
-    draw_money(screen, money, (OFFSET_X, OFFSET_Y + GRID_ROWS * SLOT_SIZE + 10))
+    draw_money(screen, get_money(), (OFFSET_X, OFFSET_Y + GRID_ROWS * SLOT_SIZE + 10))
 
     # Draw buttons
     player_button.draw(screen)
@@ -419,7 +455,7 @@ def inventory_logic():
     display_xp_bar()
 
     # Draw money value
-    draw_money(screen, money, (OFFSET_X, OFFSET_Y + GRID_ROWS * SLOT_SIZE + 10))
+    draw_money(screen, get_money(), (OFFSET_X, OFFSET_Y + GRID_ROWS * SLOT_SIZE + 10))
     # Draw item info if hovering over an item and no item is selected
     draw_item_info_logic()
 

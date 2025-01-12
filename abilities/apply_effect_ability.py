@@ -1,8 +1,8 @@
 from abilities.ability import Ability
 
 class ApplyEffectAbility(Ability):
-    def __init__(self, effect, name, description, cooldown, cost, element, sprite_path):
-        super().__init__(name, description, cooldown, cost, 'enemy', sprite_path)
+    def __init__(self, effect, name, description, cooldown, cost, element, sprite_path, max_equipped=10):
+        super().__init__(name, description, cooldown, cost, 'enemy', sprite_path, max_equipped)
         self.effect = effect
         self.element = element
 
