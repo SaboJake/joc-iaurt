@@ -1,5 +1,6 @@
 from abilities.apply_effect_ability import ApplyEffectAbility
 from abilities.basic_attack import BasicAttack
+from abilities.basic_heal import BasicHeal
 
 
 class FocusAttack(BasicAttack):
@@ -65,6 +66,7 @@ class ApplyStunAbility(ApplyEffectAbility):
 class ApplyRegenAbility(ApplyEffectAbility):
     def __init__(self, regen_effect, name, description, cooldown, cost, element, sprite_path, max_equipped=10):
         super().__init__(regen_effect, name, description, cooldown, cost, element, sprite_path, max_equipped)
+        self.target = 'ally'
 
     def get_upgrade_description(self):
         return f"{super().get_upgrade_description()}regen effect: {self.effect.coeffs['strength']} -> {self.effect.coeffs['strength'] + 0.1}\n"
@@ -79,6 +81,7 @@ class ApplyRegenAbility(ApplyEffectAbility):
 class ApplyBuffAbility(ApplyEffectAbility):
     def __init__(self, buff_effect, name, description, cooldown, cost, element, sprite_path, max_equipped=10):
         super().__init__(buff_effect, name, description, cooldown, cost, element, sprite_path, max_equipped)
+        self.target = 'ally'
 
     def get_upgrade_description(self):
         return f"{super().get_upgrade_description()}buff effect: {self.effect.coeffs['strength']} -> {self.effect.coeffs['strength'] + 0.1}\n"
@@ -90,18 +93,62 @@ class ApplyBuffAbility(ApplyEffectAbility):
             return True
         return False
 
-class StunAttack(BasicAttack, ApplyStunAbility):
+class StunAttack(BasicAttack):
     def __init__(self, coeffs, stun_effect, name, description, cooldown, cost, element, sprite_path, max_equipped=10):
-        BasicAttack.__init__(self, coeffs, name, description, cooldown, cost, element, sprite_path, max_equipped)
-        ApplyStunAbility.__init__(self, stun_effect, name, description, cooldown, cost, element, sprite_path)
+        super().__init__(coeffs, name, description, cooldown, cost, element, sprite_path, max_equipped)
+        self.effect = stun_effect
 
     def use(self, user, target):
-        ret = BasicAttack.use(self, user, target)
-        ApplyStunAbility.use(self, user, target)
+        ret = super().use(user, target)
+        if not super().use(user, target):
+            return ret
+        target.add_effect(self.effect)
         return ret
 
-    def get_upgrade_description(self):
-        return f"{BasicAttack.get_upgrade_description()}{ApplyStunAbility.get_upgrade_description()}"
+class WoundAttack(BasicAttack):
+    def __init__(self, coeffs, wound_effect, name, description, cooldown, cost, element, sprite_path, max_equipped=10):
+        super().__init__(coeffs, name, description, cooldown, cost, element, sprite_path, max_equipped)
+        self.effect = wound_effect
 
-    def ability_upgrade(self):
-        return BasicAttack.ability_upgrade(self) or ApplyStunAbility.ability_upgrade(self)
+    def use(self, user, target):
+        ret = super().use(user, target)
+        if not super().use(user, target):
+            return ret
+        target.add_effect(self.effect)
+        return ret
+
+class WeakenAttack(BasicAttack):
+    def __init__(self, coeffs, weaken_effect, name, description, cooldown, cost, element, sprite_path, max_equipped=10):
+        super().__init__(coeffs, name, description, cooldown, cost, element, sprite_path, max_equipped)
+        self.effect = weaken_effect
+
+    def use(self, user, target):
+        ret = super().use(user, target)
+        if not super().use(user, target):
+            return ret
+        target.add_effect(self.effect)
+        return ret
+
+class RegenHeal(BasicHeal):
+    def __init__(self, coeffs, regen_effect, name, description, cooldown, cost, element, sprite_path, max_equipped=10):
+        super().__init__(coeffs, name, description, cooldown, cost, element, sprite_path, max_equipped)
+        self.effect = regen_effect
+
+    def use(self, user, target):
+        ret = super().use(user, target)
+        if not super().use(user, target):
+            return ret
+        target.add_effect(self.effect)
+        return ret
+
+class BuffHeal(BasicHeal):
+    def __init__(self, coeffs, buff_effect, name, description, cooldown, cost, element, sprite_path, max_equipped=10):
+        super().__init__(coeffs, name, description, cooldown, cost, element, sprite_path, max_equipped)
+        self.effect = buff_effect
+
+    def use(self, user, target):
+        ret = super().use(user, target)
+        if not super().use(user, target):
+            return ret
+        target.add_effect(self.effect)
+        return ret

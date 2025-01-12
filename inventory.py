@@ -6,14 +6,14 @@ from units.friendly_unit import FriendlyUnit
 from utils.bar import Bar
 from utils.stats import Stats
 from utils.button import Button
-from globals import friendly_units, player_unit, get_money
+from globals import friendly_units, player_unit, ally1, get_money
 
 # Add sample unit to friendly_units
 unit_stats1 = Stats(10, 10, 10, 10, 10)
 unit_stats2 = Stats(5, 5, 5, 5, 5)
 unit = FriendlyUnit("Player", "Guardian", unit_stats1, unit_stats1)
 friendly_units["Player"] = player_unit
-friendly_units["Ally1"] = FriendlyUnit("Ally1", "Combat Medic", unit_stats2, unit_stats2)
+friendly_units["Ally1"] = ally1
 
 # Initialize Pygame
 pygame.init()
@@ -94,7 +94,6 @@ def update_save_data_inventory(save_data):
     save_data["equipment"] = equipment
     save_data["unit_equipment"] = unit_equipment
 
-
 def get_save_data_inventory(save_data):
     global inventory, equipment, unit_equipment
     inventory = save_data["inventory"]
@@ -109,7 +108,6 @@ def get_save_data_inventory(save_data):
             for item in equipment_slots.values():
                 if item:
                     unit.add_item(item.item)
-
 
 def draw_inventory(surface, inventory, selected_item):
     """Draw the inventory grid and items."""

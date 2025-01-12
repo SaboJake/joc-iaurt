@@ -16,6 +16,7 @@ class Ability:
         self.max_equipped = max_equipped
 
     def use(self, user, target):
+        print("coaie: ", user.current_focus, self.cost)
         if user.current_focus < self.cost:
             return 0
         if not self.check_valid_target(user, target):

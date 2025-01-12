@@ -24,6 +24,7 @@ from ability_screen import ability_screen_logic, ability_screen_event_handler, u
 
 background_image = pygame.image.load('sprites/backgrounds/stage_background.png')
 game_menu_background = pygame.image.load('sprites/backgrounds/game_menu_background.png')
+title_screen_background = pygame.image.load('sprites/backgrounds/title_screen.png')
 
 inventory_equipment_slots = {
     "helmet": (100, 200),
@@ -98,7 +99,7 @@ def exit_menu():
 
 screen = pygame.display.set_mode((1200, 900))
 status_bar = StatusBar(screen, [inventory_button, ability_button, save_button, load_button])
-status_bar.current_screen = ""
+status_bar.current_screen = "title_screen"
 FPS = 60
 BG_COLOR = (0, 0, 0)
 clock = pygame.time.Clock()
@@ -119,6 +120,16 @@ def set_end_battle_screen():
     # add_money(encounters[stage_no].money)
     money += encounters[stage_no].money
     end_battle_screen.xp_bar.update_value(encounters[stage_no].xp)
+
+def title_screen_start():
+    status_bar.current_screen = ""
+
+def title_screen_load():
+    status_bar.current_screen = ""
+    load()
+
+title_screen_start_button = Button(500, 500, 200, 50, (0, 0, 255), 'Start', title_screen_start)
+title_screen_load_button = Button(500, 600, 200, 50, (0, 0, 255), 'Load', title_screen_load)
 
 if __name__ == "__main__":
     running = True
@@ -173,6 +184,10 @@ if __name__ == "__main__":
             end_battle_screen.end_battle_screen_logic()
             exit_button.draw(screen)
             status_bar.draw()
+        elif status_bar.current_screen == "title_screen":
+            screen.blit(title_screen_background, (0, 0))
+            title_screen_start_button.draw(screen)
+            title_screen_load_button.draw(screen)
         pygame.display.flip()
         clock.tick(FPS)
 

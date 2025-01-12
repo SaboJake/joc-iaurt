@@ -7,6 +7,7 @@ from abilities.ability_sprite import AbilitySprite
 from abilities.basic_attack import BasicAttack
 from abilities.basic_heal import BasicHeal
 from encounters.encounter_list import encounters
+from inventory import ally1_button
 from units.player_unit import PlayerUnit
 from utils.button import Button
 from utils.display_unit import DisplayUnit
@@ -16,7 +17,7 @@ from utils.stats import Stats
 from abilities.slash_ability import SlashAbility
 from combat_hud.display_effect import DisplayEffect
 
-from globals import player_unit
+from globals import player_unit, ally1
 from constants import HEALTH_CONSTANT
 
 ally_X = [300, 200, 200]
@@ -58,27 +59,30 @@ class Stage:
         # add allies
         allies = []
         ally_units = []
-        for i in range(len(names_array)):
-            # first unit is the player
-            if i == 0:
-                ally_units.append(player_unit)
-            else:
-                ally_units.append(FriendlyUnit(names_array[i], clas_array[i], Stats(10, 10, 10, 25 + (3 - i) * 5, 10), Stats(10, 10, 10, 25 + (3 - i) * 5, 10)))
-                ally_units[i].abilities.append(BasicAttack(coeffs, "attack", "WHO CARES", 0, 0, "physical", 'sprites/abilities/slash.png'))
-                ally_units[i].abilities.append(BasicHeal(coeffs, "heal", "WHO CARES", 0, 0, "physical", 'sprites/abilities/heal.png'))
+        # for i in range(len(names_array)):
+        #     # first unit is the player
+        #     if i == 0:
+        #         ally_units.append(player_unit)
+        #     else:
+        #         ally_units.append(FriendlyUnit(names_array[i], clas_array[i], Stats(10, 10, 10, 25 + (3 - i) * 5, 10), Stats(10, 10, 10, 25 + (3 - i) * 5, 10)))
+        #         ally_units[i].abilities.append(BasicAttack(coeffs, "attack", "WHO CARES", 0, 0, "physical", 'sprites/abilities/slash.png'))
+        #         ally_units[i].abilities.append(BasicHeal(coeffs, "heal", "WHO CARES", 0, 0, "physical", 'sprites/abilities/heal.png'))
+
+        ally_units.append(player_unit)
+        ally_units.append(ally1)
 
         for ally in ally_units:
             ally.update_stats()
             ally.health = ally.stats.vitality * HEALTH_CONSTANT
             ally.current_focus = ally.stats.focus
 
-        if len(names_array) == 2:
-            for i in range(len(names_array)):
-                allies.append(DisplayUnit(ally_X[i + 1], ally_Y[i + 1], ally_width, ally_height, ally_health_X[i], ally_health_Y[i], 100, names_array[i], sprite_paths_array[i], death_sprite_paths_array[i], ally_units[i]))
+        if len(ally_units) == 2:
+            for i in range(len(ally_units)):
+                allies.append(DisplayUnit(ally_X[i + 1], ally_Y[i + 1], ally_width, ally_height, ally_health_X[i], ally_health_Y[i], 100, ally_units[i].name, sprite_paths_array[i], death_sprite_paths_array[i], ally_units[i]))
 
         else:
-            for i in range(len(names_array)):
-                allies.append(DisplayUnit(ally_X[i], ally_Y[i], ally_width, ally_height, ally_health_X[i], ally_health_Y[i], 100, names_array[i], sprite_paths_array[i], death_sprite_paths_array[i], ally_units[i]))
+            for i in range(len(ally_units)):
+                allies.append(DisplayUnit(ally_X[i], ally_Y[i], ally_width, ally_height, ally_health_X[i], ally_health_Y[i], 100, ally_units[i].name, sprite_paths_array[i], death_sprite_paths_array[i], ally_units[i]))
 
         # add enemies
         enemies = []
@@ -88,13 +92,13 @@ class Stage:
         #     enemy_units[i].abilities.append(BasicAttack(coeffs, "WHO", "CARES", 0, 0, "physical", 'sprites/abilities/slash.png'))
         #     enemy_units[i].abilities.append(BasicHeal(coeffs, "WHO", "CARES", 0, 0, "physical", 'sprites/abilities/heal.png'))
 
-        if len(names_array) == 2:
-            for i in range(len(names_array)):
-                enemies.append(DisplayUnit(enemy_x[i + 1], enemy_y[i + 1], enemy_width, enemy_height, enemy_health_x[i], enemy_health_y[i],100, names_array[i], sprite_paths_array[i], death_sprite_paths_array[i], enemy_units[i]))
+        if len(enemy_units) == 2:
+            for i in range(len(enemy_units)):
+                enemies.append(DisplayUnit(enemy_x[i + 1], enemy_y[i + 1], enemy_width, enemy_height, enemy_health_x[i], enemy_health_y[i],100, enemy_units[i].name, sprite_paths_array[i], death_sprite_paths_array[i], enemy_units[i]))
 
         else:
-            for i in range(len(names_array)):
-                enemies.append(DisplayUnit(enemy_x[i], enemy_y[i], enemy_width, enemy_height, enemy_health_x[i], enemy_health_y[i], 100, names_array[i], sprite_paths_array[i], death_sprite_paths_array[i], enemy_units[i]))
+            for i in range(len(enemy_units)):
+                enemies.append(DisplayUnit(enemy_x[i], enemy_y[i], enemy_width, enemy_height, enemy_health_x[i], enemy_health_y[i], 100, enemy_units[i].name, sprite_paths_array[i], death_sprite_paths_array[i], enemy_units[i]))
 
         self.enemies = enemies
         self.allies = allies
@@ -225,7 +229,13 @@ class Stage:
                 target = self.allies[j]
                 break
 
-        if target is not None:
+        heal_exists = False
+        for ability in ally.unit.abilities:
+            if ability.target == "ally":
+                heal_exists = True
+                break
+
+        if target is not None and heal_exists:
             # found a target, heal it
             # random heal ability
             ability = ally.unit.abilities[random.randint(0, len(ally.unit.abilities) - 1)]
@@ -260,8 +270,14 @@ class Stage:
                 target = self.enemies[j]
                 break
 
+        heal_exists = False
+        for ability in enemy.unit.abilities:
+            if ability.target == "ally":
+                heal_exists = True
+                break
+
         # found a target, heal it
-        if target is not None:
+        if target is not None and heal_exists:
             ability = enemy.unit.abilities[random.randint(0, len(enemy.unit.abilities) - 1)]
             while ability.target != "ally":
                 ability = enemy.unit.abilities[random.randint(0, len(enemy.unit.abilities) - 1)]
