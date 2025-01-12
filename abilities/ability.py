@@ -33,7 +33,7 @@ class Ability:
         return True
 
     def get_upgrade_description(self):
-        return ''
+        return "Amongus"
 
     def ability_upgrade(self):
         if self.level < self.max_level:

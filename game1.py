@@ -88,12 +88,13 @@ tricou2 = DisplayItem(Item("Tricou", "Tricou funny", "armor", sample_stats, 0, 0
 end_battle_screen = None
 
 def set_end_battle_screen():
-    global end_battle_screen, stage_no
+    global end_battle_screen, stage_no, money
 
     encounters[stage_no].perform_drops()
     end_battle_screen = EndBattleScreen(screen, [], encounters[stage_no].xp, encounters[stage_no].money, encounters[stage_no].dropped_items)
     player_unit.gain_xp(encounters[stage_no].xp)
-    add_money(encounters[stage_no].money)
+    # add_money(encounters[stage_no].money)
+    money += encounters[stage_no].money
     end_battle_screen.xp_bar.update_value(encounters[stage_no].xp)
 
 if __name__ == "__main__":
