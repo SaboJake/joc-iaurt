@@ -1,7 +1,6 @@
 from units.unit import Unit
 from utils.stats import Stats
-
-level_requirements = [0, 0, 50, 75, 100, 150, 200, 250, 300, 400, 500, 600, 700, 800, 900, 1000]
+from constants import level_requirements
 
 class FriendlyUnit(Unit):
     def __init__(self, name, clas, base_stats: Stats, stats: Stats, level=1, xp = 0):

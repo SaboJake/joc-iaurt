@@ -4,6 +4,7 @@ import pygame
 
 from encounters.encounter_list import encounters
 from end_battle_screen import EndBattleScreen
+from globals import player_unit, money, add_money
 from items.display_item import DisplayItem
 from items.item import Item
 from shop import shop_logic, shop_event_handler
@@ -13,7 +14,7 @@ from utils.stats import Stats
 pygame.init()
 
 from utils.status_bar import StatusBar
-from utils.button import Button  # Import the Button class from utils
+from utils.button import Button
 from inventory import inventory_logic, inventory_event_handler, set_equipment_slots
 from ability_screen import ability_screen_logic, ability_screen_event_handler
 
@@ -88,8 +89,12 @@ end_battle_screen = None
 
 def set_end_battle_screen():
     global end_battle_screen, stage_no
+
     encounters[stage_no].perform_drops()
     end_battle_screen = EndBattleScreen(screen, [], encounters[stage_no].xp, encounters[stage_no].money, encounters[stage_no].dropped_items)
+    player_unit.gain_xp(encounters[stage_no].xp)
+    add_money(encounters[stage_no].money)
+    end_battle_screen.xp_bar.update_value(encounters[stage_no].xp)
 
 if __name__ == "__main__":
     running = True

@@ -2,6 +2,9 @@ import pygame
 from inventory import draw_inventory, draw_item_info_logic, draw_item_following_mouse, draw_delete_logic, \
     inventory_event_handler, delete_button, get_slot_at_mouse, set_selected_item, get_selected_item, SLOT_SIZE, draw_item_info
 from inventory import inventory, selected_item
+from utils.bar import Bar
+from globals import player_unit
+from constants import level_requirements
 
 OFFSET_X = 500
 OFFSET_Y = 100
@@ -14,6 +17,9 @@ class EndBattleScreen:
         self.items = items
         self.surface = surface
         self.item_positions = []
+        self.xp_bar = Bar(OFFSET_X, OFFSET_Y + 300, 200, 20, level_requirements[player_unit.level + 1] - level_requirements[player_unit.level], (100, 100, 100), (200, 200, 200))
+        self.xp_bar.real_value =  self.xp_bar.target_value = self.xp_bar.current_value = player_unit.xp - level_requirements[player_unit.level]
+        self.target_xp = 0
 
     def display_rewards(self):
         font = pygame.font.Font(None, 36)
@@ -62,6 +68,13 @@ class EndBattleScreen:
         draw_item_following_mouse()
         draw_delete_logic()
         self.draw_item_info_rewards()
+        self.xp_bar.update()
+        self.xp_bar.draw(self.surface)
+        # if the player leveled up
+        if self.xp_bar.current_value == self.xp_bar.max_value:
+            self.xp_bar = Bar(OFFSET_X, OFFSET_Y + 300, 200, 20, level_requirements[player_unit.level + 1] - level_requirements[player_unit.level], (100, 100, 100), (200, 200, 200))
+            self.xp_bar.target_value = player_unit.xp - level_requirements[player_unit.level]
+            self.xp_bar.current_value = self.xp_bar.real_value = 0
 
     def end_battle_handle_event(self, event):
         inventory_event_handler(event)
