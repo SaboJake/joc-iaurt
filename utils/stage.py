@@ -323,6 +323,7 @@ class Stage:
 
         for enemy in self.enemies:
             enemy.update_sprite()
+            enemy.update_effects()
             if (enemy.health_bar.target_value != enemy.health_bar.current_value) and self.delay == 0:
                 self.delay += 1
 

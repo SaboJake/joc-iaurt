@@ -62,11 +62,11 @@ class SkillTree:
 
         # add abilities to the grid
         ability = BasicAttack(coeffs, "attack", "WHO CARES", 0, 0, "physical", 'sprites/abilities/slash.png')
-        basic_heal = BasicHeal(coeffs, "Basic Heal", "Heal an ally", 0, 3, "physical", 'sprites/abilities/slash.png')
-        focus_attack = FocusAttack(coeffs, "Focus Attack", "Gain focus when attacking", 0, 0, "physical", 'sprites/abilities/slash.png')
-        wound_ability = ApplyEffectAbility(wound_effect, "Wound", "Applies wound effect", 0, 0, "physical", 'sprites/abilities/slash.png')
-        weaken_ability = ApplyEffectAbility(weaken_effect, "Weaken", "Applies weaken effect", 0, 0, "physical", 'sprites/abilities/slash.png')
-        stun_ability = ApplyEffectAbility(stun_effect, "Stun", "Applies stun effect", 0, 0, "physical", 'sprites/abilities/slash.png')
+        basic_heal = BasicHeal(coeffs, "Basic Heal", "Heal an ally", 0, 3, "physical", 'sprites/abilities/restore.png')
+        focus_attack = FocusAttack(coeffs, "Focus Attack", "Gain focus when attacking", 0, 0, "physical", 'sprites/abilities/quick_strike.png')
+        wound_ability = ApplyEffectAbility(wound_effect, "Wound", "Applies wound effect", 0, 0, "physical", 'sprites/abilities/wound.png')
+        weaken_ability = ApplyEffectAbility(weaken_effect, "Weaken", "Applies weaken effect", 0, 0, "physical", 'sprites/abilities/weaken.png')
+        stun_ability = ApplyEffectAbility(stun_effect, "Stun", "Applies stun effect", 0, 0, "physical", 'sprites/abilities/break.png')
 
         self.grid[0][0] = AbilitySprite(GRID_OFFSET_X + 0 * GRID_SPACING + SLOT_SIZE / 2, GRID_OFFSET_Y + 0 * GRID_SPACING + SLOT_SIZE / 2, SLOT_SIZE, SLOT_SIZE, ability)
         self.grid[0][1] = AbilitySprite(GRID_OFFSET_X + 1 * GRID_SPACING + SLOT_SIZE / 2, GRID_OFFSET_Y + 0 * GRID_SPACING + SLOT_SIZE / 2, SLOT_SIZE, SLOT_SIZE, ability)
