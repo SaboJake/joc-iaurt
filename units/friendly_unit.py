@@ -6,7 +6,7 @@ class FriendlyUnit(Unit):
     def __init__(self, name, clas, base_stats: Stats, stats: Stats, level=1, xp = 0):
         super().__init__(name, base_stats, stats, level)
         self.clas = clas
-        self.xp = 25
+        self.xp = 0
         self.items = []
 
     def add_item(self, item):

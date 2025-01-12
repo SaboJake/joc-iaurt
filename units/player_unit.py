@@ -22,6 +22,8 @@ class PlayerUnit(FriendlyUnit):
         self.base_stats += level_up_boost
         print(f'{self.name} leveled up to level {self.level}!')
         self.xp_to_next_level = level_requirements[self.level + 1]
+        self.skill_points += 1
+        self.stat_points += 2
 
     def is_player(self):
         return True

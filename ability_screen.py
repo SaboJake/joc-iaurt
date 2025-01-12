@@ -134,7 +134,8 @@ slash2 = Ability("Slash", "A basic slash", 0, 0, "self", 'sprites/abilities/slas
 slash_sprite1 = AbilitySprite(POOL_OFFSET_X + SLOT_SIZE // 2, POOL_OFFSET_Y + SLOT_SIZE // 2, SLOT_SIZE, SLOT_SIZE, slash1)
 slash_sprite2 = AbilitySprite(POOL_OFFSET_X + SLOT_SIZE // 2 + SLOT_SIZE + 10, POOL_OFFSET_Y + SLOT_SIZE // 2, SLOT_SIZE, SLOT_SIZE, slash2)
 
-abilities =[slash_sprite1, slash_sprite2]
+# abilities =[slash_sprite1, slash_sprite2]
+abilities = []
 
 # Add the slashes to the abilities list
 ability_pool = AbilityPool((POOL_OFFSET_X, POOL_OFFSET_Y), abilities, SLOT_SIZE)

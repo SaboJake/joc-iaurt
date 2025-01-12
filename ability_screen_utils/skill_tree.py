@@ -1,12 +1,13 @@
 import pygame
 import textwrap
 
-from abilities.ability_list import FocusAttack
+from abilities.ability_list import FocusAttack, ApplyWoundAbility, ApplyWeakenAbility, ApplyStunAbility, \
+    ApplyBuffAbility, StunAttack, WoundAttack, WeakenAttack, RegenHeal, BuffHeal
 from abilities.apply_effect_ability import ApplyEffectAbility
 from abilities.basic_attack import BasicAttack
 from abilities.ability_sprite import AbilitySprite
 from abilities.basic_heal import BasicHeal
-from effects.effect_list import Wound, Weaken, Stun
+from effects.effect_list import Wound, Weaken, Stun, Buff, Regen
 from globals import player_unit
 
 # Define constants
@@ -39,6 +40,16 @@ weaken_effect = Weaken("Weaken", "Reduce stats", 3, "physical", True, wound_coef
 
 stun_effect = Stun("Stun", "Stun the target", 2, "physical", True)
 
+buff_coeffs = {
+    'strength': 0.3,
+}
+buff_effect = Buff("Buff", "Increase stats", 3, "physical", True, buff_coeffs, player_unit)
+
+regen_coeffs = {
+    'strength': 0.3,
+}
+regen_effect = Regen("Regen", "Regenerate health", 3, "physical", True, regen_coeffs, player_unit)
+
 def draw_ability(ability_sprite, surface, x, y):
     surface.blit(ability_sprite.image, (x, y))
     if not ability_sprite.bought:
@@ -61,23 +72,35 @@ class SkillTree:
         self.grid = [[None for _ in range(self.cols)] for _ in range(self.rows)]
 
         # add abilities to the grid
-        ability = BasicAttack(coeffs, "attack", "WHO CARES", 0, 0, "physical", 'sprites/abilities/slash.png')
-        basic_heal = BasicHeal(coeffs, "Basic Heal", "Heal an ally", 0, 3, "physical", 'sprites/abilities/restore.png')
+        basic_attack = BasicAttack(coeffs, "Basic attack", "Damages an ally", 0, 0, "physical", 'sprites/abilities/slash.png')
+        basic_heal = BasicHeal(coeffs, "Basic Heal", "Heal an ally", 0, 2, "physical", 'sprites/abilities/restore.png')
         focus_attack = FocusAttack(coeffs, "Focus Attack", "Gain focus when attacking", 0, 0, "physical", 'sprites/abilities/quick_strike.png')
-        wound_ability = ApplyEffectAbility(wound_effect, "Wound", "Applies wound effect", 0, 0, "physical", 'sprites/abilities/wound.png')
-        weaken_ability = ApplyEffectAbility(weaken_effect, "Weaken", "Applies weaken effect", 0, 0, "physical", 'sprites/abilities/weaken.png')
-        stun_ability = ApplyEffectAbility(stun_effect, "Stun", "Applies stun effect", 0, 0, "physical", 'sprites/abilities/break.png', 1)
+        wound_ability = ApplyWoundAbility(wound_effect, "Wound", "Applies wound effect", 0, 0, "physical", 'sprites/abilities/wound.png')
+        weaken_ability = ApplyWeakenAbility(weaken_effect, "Weaken", "Applies weaken effect", 0, 0, "physical", 'sprites/abilities/weaken.png')
+        stun_ability = ApplyStunAbility(stun_effect, "Stun", "Applies stun effect", 0, 3, "physical", 'sprites/abilities/break.png', 1)
+        buff_ability = ApplyBuffAbility(buff_effect, "Buff", "Applies buff effect", 0, 2, "physical", 'sprites/abilities/buff.png', 1)
+        stun_attack = StunAttack(coeffs, stun_effect, "Stun Attack", "Stun the target", 0, 2, "physical", 'sprites/abilities/break.png')
+        wound_attack = WoundAttack(coeffs, wound_effect, "Wound Attack", "Deal damage over time", 0, 2, "physical", 'sprites/abilities/wound.png')
+        weaken_attack = WeakenAttack(coeffs, weaken_effect, "Weaken Attack", "Reduce stats", 0, 2, "physical", 'sprites/abilities/weaken.png')
+        regen_heal = RegenHeal(coeffs, regen_effect, "Regen Heal", "Regenerate health", 0, 3, "physical", 'sprites/abilities/regen.png')
+        buff_heal = BuffHeal(coeffs, buff_effect, "Buff Heal", "Increase stats", 0, 3, "physical", 'sprites/abilities/buff.png')
 
-        self.grid[0][0] = AbilitySprite(GRID_OFFSET_X + 0 * GRID_SPACING + SLOT_SIZE / 2, GRID_OFFSET_Y + 0 * GRID_SPACING + SLOT_SIZE / 2, SLOT_SIZE, SLOT_SIZE, ability)
-        self.grid[0][1] = AbilitySprite(GRID_OFFSET_X + 1 * GRID_SPACING + SLOT_SIZE / 2, GRID_OFFSET_Y + 0 * GRID_SPACING + SLOT_SIZE / 2, SLOT_SIZE, SLOT_SIZE, ability)
-        self.grid[0][2] = AbilitySprite(GRID_OFFSET_X + 2 * GRID_SPACING + SLOT_SIZE / 2, GRID_OFFSET_Y + 0 * GRID_SPACING + SLOT_SIZE / 2, SLOT_SIZE, SLOT_SIZE, focus_attack)
-        self.grid[0][3] = AbilitySprite(GRID_OFFSET_X + 3 * GRID_SPACING + SLOT_SIZE / 2, GRID_OFFSET_Y + 0 * GRID_SPACING + SLOT_SIZE / 2, SLOT_SIZE, SLOT_SIZE, basic_heal)
-        self.grid[1][0] = AbilitySprite(GRID_OFFSET_X + 0 * GRID_SPACING + SLOT_SIZE / 2, GRID_OFFSET_Y + 1 * GRID_SPACING + SLOT_SIZE / 2, SLOT_SIZE, SLOT_SIZE, wound_ability,
-                                        prereqs=[self.grid[0][0]])
-        self.grid[1][1] = AbilitySprite(GRID_OFFSET_X + 1 * GRID_SPACING + SLOT_SIZE / 2, GRID_OFFSET_Y + 1 * GRID_SPACING + SLOT_SIZE / 2, SLOT_SIZE, SLOT_SIZE, stun_ability,
+        self.grid[0][0] = AbilitySprite(GRID_OFFSET_X + 0 * GRID_SPACING + SLOT_SIZE / 2, GRID_OFFSET_Y + 0 * GRID_SPACING + SLOT_SIZE / 2, SLOT_SIZE, SLOT_SIZE, stun_ability)
+        self.grid[0][1] = AbilitySprite(GRID_OFFSET_X + 1 * GRID_SPACING + SLOT_SIZE / 2, GRID_OFFSET_Y + 0 * GRID_SPACING + SLOT_SIZE / 2, SLOT_SIZE, SLOT_SIZE, basic_attack)
+        self.grid[0][2] = AbilitySprite(GRID_OFFSET_X + 2 * GRID_SPACING + SLOT_SIZE / 2, GRID_OFFSET_Y + 0 * GRID_SPACING + SLOT_SIZE / 2, SLOT_SIZE, SLOT_SIZE, basic_heal)
+        self.grid[0][3] = AbilitySprite(GRID_OFFSET_X + 3 * GRID_SPACING + SLOT_SIZE / 2, GRID_OFFSET_Y + 0 * GRID_SPACING + SLOT_SIZE / 2, SLOT_SIZE, SLOT_SIZE, buff_ability)
+        self.grid[1][0] = AbilitySprite(GRID_OFFSET_X + 0 * GRID_SPACING + SLOT_SIZE / 2, GRID_OFFSET_Y + 1 * GRID_SPACING + SLOT_SIZE / 2, SLOT_SIZE, SLOT_SIZE, stun_attack,
+                                        prereqs=[self.grid[0][0], self.grid[0][1]])
+        self.grid[1][1] = AbilitySprite(GRID_OFFSET_X + 1 * GRID_SPACING + SLOT_SIZE / 2, GRID_OFFSET_Y + 1 * GRID_SPACING + SLOT_SIZE / 2, SLOT_SIZE, SLOT_SIZE, focus_attack,
                                         prereqs=[self.grid[0][1]])
-        self.grid[2][0] = AbilitySprite(GRID_OFFSET_X + 0 * GRID_SPACING + SLOT_SIZE / 2, GRID_OFFSET_Y + 2 * GRID_SPACING + SLOT_SIZE / 2, SLOT_SIZE, SLOT_SIZE, weaken_ability,
-                                        prereqs=[self.grid[1][0]])
+        self.grid[1][2] = AbilitySprite(GRID_OFFSET_X + 2 * GRID_SPACING + SLOT_SIZE / 2, GRID_OFFSET_Y + 1 * GRID_SPACING + SLOT_SIZE / 2, SLOT_SIZE, SLOT_SIZE, regen_heal,
+                                        prereqs=[self.grid[0][2]])
+        self.grid[1][3] = AbilitySprite(GRID_OFFSET_X + 3 * GRID_SPACING + SLOT_SIZE / 2, GRID_OFFSET_Y + 1 * GRID_SPACING + SLOT_SIZE / 2, SLOT_SIZE, SLOT_SIZE, buff_heal,
+                                        prereqs=[self.grid[0][2], self.grid[0][3]])
+        self.grid[2][1] = AbilitySprite(GRID_OFFSET_X + 1 * GRID_SPACING + SLOT_SIZE / 2, GRID_OFFSET_Y + 2 * GRID_SPACING + SLOT_SIZE / 2, SLOT_SIZE, SLOT_SIZE, wound_attack,
+                                        prereqs=[self.grid[1][1]])
+        self.grid[3][1] = AbilitySprite(GRID_OFFSET_X + 1 * GRID_SPACING + SLOT_SIZE / 2, GRID_OFFSET_Y + 3 * GRID_SPACING + SLOT_SIZE / 2, SLOT_SIZE, SLOT_SIZE, weaken_attack,
+                                        prereqs=[self.grid[2][1]])
 
         self.ability_pool = ability_pool
 

@@ -56,6 +56,7 @@ class ApplyWeakenAbility(ApplyEffectAbility):
 class ApplyStunAbility(ApplyEffectAbility):
     def __init__(self, stun_effect, name, description, cooldown, cost, element, sprite_path, max_equipped=10):
         super().__init__(stun_effect, name, description, cooldown, cost, element, sprite_path, max_equipped)
+        self.max_level = 1
 
     def ability_upgrade(self):
         if self.level < self.max_level:
@@ -97,6 +98,7 @@ class StunAttack(BasicAttack):
     def __init__(self, coeffs, stun_effect, name, description, cooldown, cost, element, sprite_path, max_equipped=10):
         super().__init__(coeffs, name, description, cooldown, cost, element, sprite_path, max_equipped)
         self.effect = stun_effect
+        self.max_level = 1
 
     def use(self, user, target):
         ret = super().use(user, target)
@@ -109,6 +111,7 @@ class WoundAttack(BasicAttack):
     def __init__(self, coeffs, wound_effect, name, description, cooldown, cost, element, sprite_path, max_equipped=10):
         super().__init__(coeffs, name, description, cooldown, cost, element, sprite_path, max_equipped)
         self.effect = wound_effect
+        self.max_level = 1
 
     def use(self, user, target):
         ret = super().use(user, target)
@@ -121,6 +124,7 @@ class WeakenAttack(BasicAttack):
     def __init__(self, coeffs, weaken_effect, name, description, cooldown, cost, element, sprite_path, max_equipped=10):
         super().__init__(coeffs, name, description, cooldown, cost, element, sprite_path, max_equipped)
         self.effect = weaken_effect
+        self.max_level = 1
 
     def use(self, user, target):
         ret = super().use(user, target)
@@ -133,6 +137,7 @@ class RegenHeal(BasicHeal):
     def __init__(self, coeffs, regen_effect, name, description, cooldown, cost, element, sprite_path, max_equipped=10):
         super().__init__(coeffs, name, description, cooldown, cost, element, sprite_path, max_equipped)
         self.effect = regen_effect
+        self.max_level = 1
 
     def use(self, user, target):
         ret = super().use(user, target)
@@ -145,6 +150,7 @@ class BuffHeal(BasicHeal):
     def __init__(self, coeffs, buff_effect, name, description, cooldown, cost, element, sprite_path, max_equipped=10):
         super().__init__(coeffs, name, description, cooldown, cost, element, sprite_path, max_equipped)
         self.effect = buff_effect
+        self.max_level = 1
 
     def use(self, user, target):
         ret = super().use(user, target)

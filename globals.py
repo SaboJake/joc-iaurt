@@ -7,7 +7,7 @@ from utils.stats import Stats
 friendly_units = {}
 money = 100
 
-player_unit = PlayerUnit("Darius", "Warrior", Stats(10, 10, 10, 35, 10, 10, 10, 10), Stats(10, 10, 10, 35, 10, 10, 10, 10))
+player_unit = PlayerUnit("Arius", "Warrior", Stats(10, 10, 10, 35, 10, 10, 10, 10), Stats(10, 10, 10, 35, 10, 10, 10, 10))
 
 def get_money():
     return money
@@ -23,8 +23,8 @@ coeffs = {
     'speed': 1
 }
 
-ally_stats = Stats(5, 5, 5, 5, 5)
-ally1 = FriendlyUnit("Ally1", "Combat Medic", ally_stats, ally_stats)
+ally_stats = Stats(15, 15, 15, 30, 15)
+ally1 = FriendlyUnit("Horia", "Combat Medic", ally_stats, ally_stats)
 ally1.abilities.append(BasicAttack(coeffs, "attack", "WHO CARES", 0, 0, "physical", 'sprites/abilities/slash.png'))
 ally1.abilities.append(BasicHeal(coeffs, "heal", "WHO CARES", 0, 0, "physical", 'sprites/abilities/heal.png'))
 
